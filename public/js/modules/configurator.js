@@ -603,7 +603,7 @@ async function initializeLastFmWidget(lastfmConfig) {
     // Set heading text using profile name
     const profileName = window.siteConfig?.profile?.name;
     if (heading && profileName) {
-        heading.textContent = profileName.toUpperCase() + ''S SCROBBLES';
+        heading.textContent = profileName.toUpperCase() + "'S SCROBBLES";
     }
 
     // Initial check: show now-playing indicator on the FAB immediately
