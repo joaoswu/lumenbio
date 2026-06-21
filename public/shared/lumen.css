@@ -2,14 +2,14 @@
    Lumenbio — shared design system
    ============================================================ */
 :root {
-    --bg: #0b0809;
-    --bg-2: #130d0f;
-    --text: #f3eded;
-    --text-2: #a59a9c;
-    --text-3: #6e6264;
-    --accent: #c4313a;
-    --accent-2: #9b1d2b;
-    --accent-3: #6f1119;
+    --bg: #000000;
+    --bg-2: #0f0f0f;
+    --text: #ffffff;
+    --text-2: #a3a3a3;
+    --text-3: #525252;
+    --accent: #ffffff;
+    --accent-2: #b3b3b3;
+    --accent-3: #2d2d2d;
 
     --glass-bg: rgba(255, 255, 255, 0.045);
     --glass-bg-2: rgba(255, 255, 255, 0.07);
@@ -171,7 +171,7 @@ body {
     padding: 8px 18px;
     border-radius: 999px;
     background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, var(--accent-3)));
-    color: #fff;
+    color: var(--bg);
     text-decoration: none;
     font-size: 0.85rem;
     font-weight: 600;
@@ -227,7 +227,7 @@ body {
 .btn > * { position: relative; z-index: 1; }
 .btn-primary {
     background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--accent-3)));
-    color: #fff;
+    color: var(--bg);
     box-shadow: 0 8px 26px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 34px color-mix(in srgb, var(--accent) 55%, transparent); }
