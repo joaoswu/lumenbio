@@ -34,6 +34,7 @@
     const ctx2d = canvas.getContext('2d');
 
     const audio = new Audio();
+    audio.crossOrigin = 'anonymous'; // Support Web Audio API for cross-origin URLs like Vercel Blob
     audio.preload = 'metadata';
     audio.volume = Math.min(1, Math.max(0, (cfg.volume != null ? cfg.volume : 50) / 100));
     if (vol) vol.value = Math.round(audio.volume * 100);
@@ -50,7 +51,23 @@
       } catch (e) { return 'Track'; }
     }
 
+    function updateMediaSession(artUrl) {
+      if (!('mediaSession' in navigator)) return;
+      const t = tracks[idx];
+      if (!t) return;
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: t.title || filenameTitle(t.url),
+        artist: t.artist || 'Unknown Artist',
+        artwork: artUrl ? [{ src: artUrl, sizes: '512x512', type: 'image/jpeg' }, { src: artUrl, sizes: '512x512', type: 'image/png' }] : []
+      });
+      navigator.mediaSession.setActionHandler('play', play);
+      navigator.mediaSession.setActionHandler('pause', pause);
+      navigator.mediaSession.setActionHandler('previoustrack', () => loadTrack(idx - 1, true));
+      navigator.mediaSession.setActionHandler('nexttrack', () => loadTrack(idx + 1, true));
+    }
+
     function setArt(url) {
+      updateMediaSession(url);
       if (url) {
         artImg.src = url;
         artImg.style.display = 'block';
@@ -162,6 +179,10 @@
     prevBtn.addEventListener('click', () => loadTrack(idx - 1, true));
     nextBtn.addEventListener('click', () => loadTrack(idx + 1, true));
     audio.addEventListener('ended', () => loadTrack(idx + 1, true));
+    audio.addEventListener('error', () => {
+      console.warn('Track failed to load, skipping to next track...');
+      if (tracks.length > 1) setTimeout(() => loadTrack(idx + 1, true), 1000);
+    });
     audio.addEventListener('timeupdate', () => {
       if (audio.duration) progressBar.style.width = (audio.currentTime / audio.duration * 100) + '%';
     });

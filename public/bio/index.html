@@ -15,25 +15,26 @@
 </head>
 <body>
 
-    <!-- Last.fm Widget - Top Left Corner -->
-    <div class="corner-widget corner-tl">
-        <div class="lastfm-widget glass">
-            <div class="widget-head">
+    <!-- Last.fm Scrobble History Button + Panel -->
+    <button class="lastfm-fab glass" id="lastfm-fab" aria-label="Recent scrobbles" hidden>
+        <span class="eq eq-fab" id="lastfm-eq-fab" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <i class="fab fa-lastfm lastfm-fab-icon"></i>
+    </button>
+
+    <div class="scrobble-panel glass" id="scrobble-panel" hidden>
+        <div class="scrobble-header">
+            <div class="scrobble-header-left">
                 <span class="eq" id="lastfm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-                <span class="widget-title" id="lastfm-title">Listening to</span>
+                <span class="scrobble-heading" id="scrobble-heading">Recent Scrobbles</span>
             </div>
-            <div class="lastfm-body">
-                <div class="album-art-wrap">
-                    <img class="album-art" id="album-art" alt="" loading="lazy">
-                    <i class="fas fa-music album-art-fallback" aria-hidden="true"></i>
-                </div>
-                <div class="lastfm-meta">
-                    <div class="track-name" id="track-name">Loading track…</div>
-                    <div class="artist-name" id="artist-name">Last.fm</div>
-                </div>
-            </div>
+            <button class="scrobble-close" id="scrobble-close" aria-label="Close"><i class="fas fa-xmark"></i></button>
         </div>
+        <ul class="scrobble-list" id="scrobble-list">
+            <li class="scrobble-loading"><i class="fas fa-spinner fa-spin"></i> Loading…</li>
+        </ul>
     </div>
+    <div class="scrobble-overlay" id="scrobble-overlay" hidden></div>
+
 
     <!-- Background Overlay -->
     <div id="background-overlay"></div>

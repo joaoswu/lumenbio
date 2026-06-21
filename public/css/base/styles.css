@@ -616,101 +616,249 @@ body {
 }
 
 /* ============================================================
-   Corner Widgets (Last.fm + Music Player)
+   Last.fm FAB + Scrobble History Panel
    ============================================================ */
-.corner-widget {
+.lastfm-fab {
     position: fixed;
-    z-index: 50;
-    display: none;
+    top: 1.25rem;
+    left: 1.25rem;
+    z-index: 70;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    color: var(--color-text);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 1.15rem;
+    box-shadow: var(--glass-shadow), var(--glass-highlight);
+    transition: transform 0.25s var(--ease-out-soft),
+                box-shadow 0.25s,
+                background 0.25s;
 }
-
-.corner-tl { top: 1.5rem; left: 1.5rem; }
-.corner-bl { bottom: 1.5rem; left: 1.5rem; }
-
-@media (min-width: 1024px) {
-    .corner-widget { display: block; }
+.lastfm-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45),
+                0 0 22px color-mix(in srgb, var(--color-primary) 30%, transparent),
+                var(--glass-highlight);
+    background: color-mix(in srgb, var(--color-primary) 20%, var(--glass-bg));
 }
+.lastfm-fab:active { transform: scale(0.95); }
+.lastfm-fab[hidden] { display: none; }
 
-.widget-head {
+/* The eq bars sit behind the icon. When now-playing, they peek out */
+.lastfm-fab .eq-fab {
+    position: absolute;
+    inset: 0;
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.6rem;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2px;
+    padding-bottom: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
+.lastfm-fab .eq-fab.playing { opacity: 0.4; }
+.lastfm-fab .lastfm-fab-icon { position: relative; z-index: 1; }
 
-.widget-title {
-    font-size: 0.66rem;
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    white-space: nowrap;
+/* ---------- Scrobble overlay (semi-dark backdrop) ---------- */
+.scrobble-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 79;
+    background: rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+.scrobble-overlay.open { opacity: 1; pointer-events: auto; }
+.scrobble-overlay[hidden] { display: none; }
+
+/* ---------- Scrobble Panel ---------- */
+.scrobble-panel {
+    position: fixed;
+    top: 1.25rem;
+    left: 1.25rem;
+    z-index: 80;
+    width: min(360px, calc(100vw - 2rem));
+    max-height: min(72vh, 620px);
+    border-radius: 18px;
+    padding: 0;
     overflow: hidden;
-    text-overflow: ellipsis;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.88) translateY(-10px);
+    transform-origin: top left;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.35s var(--ease-out-soft), opacity 0.25s ease;
 }
-
-/* Last.fm widget */
-.lastfm-widget {
-    width: 250px;
-    padding: 0.85rem;
-    transition: transform var(--transition-base) var(--ease-out-soft), box-shadow var(--transition-base);
+.scrobble-panel.open {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
 }
+.scrobble-panel[hidden] { display: none; }
 
-.lastfm-widget:hover,
-.music-player-widget:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), var(--glass-highlight);
-}
-
-.lastfm-body {
+.scrobble-header {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
+    justify-content: space-between;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--glass-border);
+    flex-shrink: 0;
+}
+.scrobble-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.scrobble-heading {
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+.scrobble-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg-strong);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 0.72rem;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+.scrobble-close:hover { background: var(--color-primary); color: var(--color-background); }
+.scrobble-close:active { transform: scale(0.9); }
+
+/* ---------- Scrobble List ---------- */
+.scrobble-list {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0;
+    overflow-y: auto;
+    flex: 1;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-primary) 35%, transparent) transparent;
+}
+.scrobble-list::-webkit-scrollbar { width: 5px; }
+.scrobble-list::-webkit-scrollbar-track { background: transparent; }
+.scrobble-list::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-primary) 35%, transparent);
+    border-radius: 5px;
 }
 
-.album-art-wrap {
-    position: relative;
-    width: 44px;
-    height: 44px;
+.scrobble-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    transition: background 0.15s ease;
+    cursor: default;
+}
+.scrobble-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.scrobble-art {
+    width: 40px;
+    height: 40px;
     border-radius: 8px;
     overflow: hidden;
     flex-shrink: 0;
     background: rgba(255, 255, 255, 0.06);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
+    position: relative;
 }
-
-.album-art {
+.scrobble-art img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: none;
 }
+.scrobble-art img.show { display: block; }
+.scrobble-art .scrobble-art-fallback { color: var(--color-text-muted); font-size: 0.85rem; }
+.scrobble-art img.show + .scrobble-art-fallback { display: none; }
 
-.album-art.show { display: block; }
-.album-art-fallback { color: var(--color-text-muted); font-size: 1rem; }
-.album-art.show + .album-art-fallback { display: none; }
+/* Now-playing indicator pulse ring on the art thumbnail */
+.scrobble-item.now-playing .scrobble-art::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 10px;
+    border: 2px solid var(--color-primary);
+    animation: scrobble-ring-pulse 2s ease-in-out infinite;
+}
+@keyframes scrobble-ring-pulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50%      { opacity: 1;   transform: scale(1.04); }
+}
 
-.lastfm-meta { flex: 1; min-width: 0; }
-
-.track-name {
-    font-size: 0.82rem;
+.scrobble-meta {
+    flex: 1;
+    min-width: 0;
+}
+.scrobble-track {
+    font-size: 0.8rem;
     font-weight: 500;
     color: var(--color-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: opacity 0.3s ease;
 }
-
-.artist-name {
-    font-size: 0.7rem;
+.scrobble-artist {
+    font-size: 0.68rem;
     color: var(--color-text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: opacity 0.3s ease;
 }
+.scrobble-time {
+    font-size: 0.6rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.scrobble-item.now-playing .scrobble-track { color: var(--color-primary); }
+.scrobble-item.now-playing .scrobble-time { color: var(--color-primary); font-weight: 500; }
+
+.scrobble-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 2rem;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+}
+
+.scrobble-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+}
+
+@media (max-width: 480px) {
+    .lastfm-fab { top: 0.75rem; left: 0.75rem; width: 42px; height: 42px; font-size: 1rem; }
+    .scrobble-panel { top: 0.75rem; left: 0.75rem; width: calc(100vw - 1.5rem); max-height: 65vh; }
+}
+
 
 /* Equalizer (now-playing indicator) */
 .eq {

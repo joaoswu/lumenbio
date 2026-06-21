@@ -61,12 +61,14 @@ class WelcomeScreen {
 
         this.welcomeElement.classList.add('hidden');
 
+        // Fire the event synchronously so audio.play() retains the user-gesture token
+        document.dispatchEvent(new CustomEvent('welcomeScreenDismissed'));
+
         setTimeout(() => {
             if (this.welcomeElement && this.welcomeElement.parentNode) {
                 this.welcomeElement.parentNode.removeChild(this.welcomeElement);
             }
             
-            document.dispatchEvent(new CustomEvent('welcomeScreenDismissed'));
             if (this.mainContent) {
                 this.mainContent.focus();
             }

@@ -58,11 +58,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (config.lastfm && config.lastfm.enabled && config.lastfm.username && window.LastFmService) {
         initializeLastFmWidget(config.lastfm);
     } else {
-
-        const lastfmWidget = document.querySelector('.lastfm-widget');
-        if (lastfmWidget) {
-            lastfmWidget.parentElement.style.display = 'none';
-        }
+        const fab = document.getElementById('lastfm-fab');
+        if (fab) fab.hidden = true;
     }
 
     if (config.discord && config.discord.enabled && config.discord.userId && window.DiscordWidget) {
@@ -468,28 +465,24 @@ window.updateConfig = function(newConfig) {
 };
 
 async function initializeLastFmWidget(lastfmConfig) {
-    const trackNameElement = document.getElementById('track-name');
-    const artistNameElement = document.getElementById('artist-name');
-    
-    if (!trackNameElement || !artistNameElement) {
-        console.warn('Last.fm widget elements not found');
-        return;
-    }
-    
-    let lastFmService = null;
-    
+    const fab = document.getElementById('lastfm-fab');
+    const panel = document.getElementById('scrobble-panel');
+    const overlay = document.getElementById('scrobble-overlay');
+    const closeBtn = document.getElementById('scrobble-close');
+    const list = document.getElementById('scrobble-list');
+    const heading = document.getElementById('scrobble-heading');
+    const eqFab = document.getElementById('lastfm-eq-fab');
+    const eqPanel = document.getElementById('lastfm-eq');
+
+    if (!fab || !panel) return;
+
     const apiKey = window.siteConfig?.lastfm?.apiKey || '';
-    if (apiKey && lastfmConfig.username) {
-        lastFmService = new LastFmService(apiKey, lastfmConfig.username);
-    } else {
-        console.warn('Last.fm API key or username not configured');
-        trackNameElement.textContent = 'Last.fm not configured';
-        artistNameElement.textContent = 'Check your .env file';
-        return;
-    }
-    
-    const albumArtElement = document.getElementById('album-art');
-    const eqElement = document.getElementById('lastfm-eq');
+    if (!apiKey || !lastfmConfig.username) return;
+
+    const lastFmService = new LastFmService(apiKey, lastfmConfig.username);
+
+    // Show the FAB
+    fab.hidden = false;
 
     // Last.fm returns this star image when a track has no real album art.
     const LASTFM_PLACEHOLDER = '2a96cbd8b46e442fc41c2b86b821562f';
@@ -503,55 +496,134 @@ async function initializeLastFmWidget(lastfmConfig) {
         return '';
     }
 
-    function setAlbumArt(url) {
-        if (!albumArtElement) return;
-        if (url) {
-            albumArtElement.src = url;
-            albumArtElement.classList.add('show');
-            albumArtElement.onerror = () => albumArtElement.classList.remove('show');
-        } else {
-            albumArtElement.removeAttribute('src');
-            albumArtElement.classList.remove('show');
-        }
+    function relativeTime(dateStr) {
+        if (!dateStr) return 'Now';
+        const then = new Date(dateStr * 1000 || dateStr);
+        const diff = Math.floor((Date.now() - then.getTime()) / 1000);
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+        if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+        return Math.floor(diff / 86400) + 'd ago';
     }
 
-    async function updateTrackDisplay() {
-        if (!lastFmService) return;
+    function renderTracks(tracks) {
+        list.innerHTML = '';
+        if (!tracks.length) {
+            list.innerHTML = '<li class="scrobble-empty"><i class="fas fa-compact-disc fa-spin" style="animation-duration: 4s; font-size: 1.4rem; margin-bottom: 8px; opacity: 0.5; display: block;"></i> No recent scrobbles found.<br><span style="font-size: 0.72rem; opacity: 0.6;">Time to spin some tracks!</span></li>';
+            return;
+        }
 
-        try {
-            const currentTrack = await lastFmService.getCurrentTrack();
-            if (currentTrack) {
-                const track = {
-                    name: currentTrack.name || 'Unknown Track',
-                    artist: currentTrack.artist?.['#text'] || currentTrack.artist || 'Unknown Artist',
-                    isPlaying: currentTrack['@attr']?.nowplaying === 'true',
-                    art: getAlbumArt(currentTrack)
-                };
-                if (eqElement) eqElement.classList.toggle('playing', track.isPlaying);
-                trackNameElement.style.opacity = 0;
-                artistNameElement.style.opacity = 0;
-                setTimeout(() => {
-                    trackNameElement.textContent = track.name;
-                    artistNameElement.textContent = track.artist;
-                    setAlbumArt(track.art);
-                    trackNameElement.style.opacity = 1;
-                    artistNameElement.style.opacity = 1;
-                }, 300);
-            } else {
-                if (eqElement) eqElement.classList.remove('playing');
-                trackNameElement.textContent = 'Not listening';
-                artistNameElement.textContent = 'Last.fm';
-                setAlbumArt('');
+        let isNowPlaying = false;
+        tracks.forEach(t => {
+            const np = t['@attr']?.nowplaying === 'true';
+            if (np) isNowPlaying = true;
+            const name = t.name || 'Unknown';
+            const artist = t.artist?.['#text'] || t.artist || '';
+            const art = getAlbumArt(t);
+            const time = np ? 'Now' : relativeTime(t.date?.uts);
+
+            const li = document.createElement('li');
+            li.className = 'scrobble-item' + (np ? ' now-playing' : '');
+            li.innerHTML =
+                '<div class="scrobble-art">' +
+                    '<img alt="" loading="lazy">' +
+                    '<i class="fas fa-music scrobble-art-fallback" aria-hidden="true"></i>' +
+                '</div>' +
+                '<div class="scrobble-meta">' +
+                    '<div class="scrobble-track"></div>' +
+                    '<div class="scrobble-artist"></div>' +
+                '</div>' +
+                '<span class="scrobble-time"></span>';
+
+            li.querySelector('.scrobble-track').textContent = name;
+            li.querySelector('.scrobble-artist').textContent = artist;
+            li.querySelector('.scrobble-time').textContent = time;
+
+            const img = li.querySelector('.scrobble-art img');
+            if (art) {
+                img.src = art;
+                img.classList.add('show');
+                img.onerror = () => img.classList.remove('show');
             }
-        } catch (error) {
-            console.error('Failed to fetch from Last.fm:', error);
-            if (eqElement) eqElement.classList.remove('playing');
-            trackNameElement.textContent = 'API Error';
-            artistNameElement.textContent = 'Last.fm unavailable';
-        }
+
+            list.appendChild(li);
+        });
+
+        // Update eq indicators
+        if (eqFab) eqFab.classList.toggle('playing', isNowPlaying);
+        if (eqPanel) eqPanel.classList.toggle('playing', isNowPlaying);
     }
-    
-    await updateTrackDisplay();
-    
-    setInterval(updateTrackDisplay, 30000);
+
+    let panelOpen = false;
+    let loaded = false;
+
+    function openPanel() {
+        panelOpen = true;
+        panel.hidden = false;
+        overlay.hidden = false;
+        // Trigger reflow then animate
+        panel.offsetHeight;
+        panel.classList.add('open');
+        overlay.classList.add('open');
+        fab.style.opacity = '0';
+        fab.style.pointerEvents = 'none';
+        if (!loaded) fetchTracks();
+    }
+
+    function closePanel() {
+        panelOpen = false;
+        panel.classList.remove('open');
+        overlay.classList.remove('open');
+        fab.style.opacity = '';
+        fab.style.pointerEvents = '';
+        setTimeout(() => {
+            if (!panelOpen) {
+                panel.hidden = true;
+                overlay.hidden = true;
+            }
+        }, 350);
+    }
+
+    async function fetchTracks() {
+        loaded = true;
+        list.innerHTML = '<li class="scrobble-loading"><i class="fas fa-spinner fa-spin"></i> Loading…</li>';
+        const tracks = await lastFmService.getRecentTracks(25);
+        renderTracks(tracks);
+    }
+
+    fab.addEventListener('click', openPanel);
+    closeBtn.addEventListener('click', closePanel);
+    overlay.addEventListener('click', closePanel);
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && panelOpen) closePanel();
+    });
+
+    // Set heading text using profile name
+    const profileName = window.siteConfig?.profile?.name;
+    if (heading && profileName) {
+        heading.textContent = profileName.toUpperCase() + ''S SCROBBLES';
+    }
+
+    // Initial check: show now-playing indicator on the FAB immediately
+    const current = await lastFmService.getCurrentTrack();
+    if (current) {
+        const np = current['@attr']?.nowplaying === 'true';
+        if (eqFab) eqFab.classList.toggle('playing', np);
+    }
+
+    // Auto-refresh when panel is open
+    setInterval(async () => {
+        if (panelOpen) {
+            const tracks = await lastFmService.getRecentTracks(25);
+            renderTracks(tracks);
+        } else {
+            // Just check now-playing status for the FAB indicator
+            const current = await lastFmService.getCurrentTrack();
+            if (current && eqFab) {
+                eqFab.classList.toggle('playing', current['@attr']?.nowplaying === 'true');
+            }
+        }
+    }, 60000);
 }
