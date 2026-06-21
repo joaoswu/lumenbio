@@ -1,5 +1,6 @@
 const crypto = require('crypto');
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
+const kv = Redis.fromEnv();
 
 let SECRET = process.env.JWT_SECRET;
 

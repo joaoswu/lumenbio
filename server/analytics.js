@@ -1,4 +1,5 @@
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
+const kv = Redis.fromEnv();
 
 async function load() {
   try { return (await kv.get('lumen_analytics')) || {}; }
