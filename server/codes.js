@@ -1,32 +1,22 @@
-/**
- * Premium redeem codes — single-use, file-backed (data/codes.json).
- */
-const fs = require('fs');
-const path = require('path');
+const { kv } = require('@vercel/kv');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const FILE = path.join(DATA_DIR, 'codes.json');
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-
-function load() {
-  try { return JSON.parse(fs.readFileSync(FILE, 'utf8')); }
+async function load() {
+  try { return (await kv.get('lumen_codes')) || { codes: [] }; }
   catch (e) { return { codes: [] }; }
 }
 
-let db = load();
-
-function save() {
-  const tmp = FILE + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(db, null, 2), 'utf8');
-  fs.renameSync(tmp, FILE);
+async function save(db) {
+  try { await kv.set('lumen_codes', db); } catch(e) {}
 }
 
-// Seed a few single-use codes the first time.
-if (!db.codes.length) {
-  const seed = (process.env.PREMIUM_CODES || 'LUMEN-PREMIUM,FOUNDER,VIP2026')
-    .split(',').map(c => c.trim().toUpperCase()).filter(Boolean);
-  db.codes = seed.map(code => ({ code, used: false, usedBy: null, usedAt: null, createdAt: new Date().toISOString() }));
-  save();
+async function checkSeed() {
+  const db = await load();
+  if (!db.codes.length) {
+    const seed = (process.env.PREMIUM_CODES || 'LUMEN-PREMIUM,FOUNDER,VIP2026')
+      .split(',').map(c => c.trim().toUpperCase()).filter(Boolean);
+    db.codes = seed.map(code => ({ code, used: false, usedBy: null, usedAt: null, createdAt: new Date().toISOString() }));
+    await save(db);
+  }
 }
 
 function randomCode() {
@@ -36,8 +26,14 @@ function randomCode() {
 }
 
 module.exports = {
-  list: () => db.codes.slice().reverse(),
-  redeem(codeStr, user) {
+  async list() { 
+    await checkSeed();
+    const db = await load(); 
+    return db.codes.slice().reverse(); 
+  },
+  async redeem(codeStr, user) {
+    await checkSeed();
+    const db = await load();
     const code = String(codeStr || '').trim().toUpperCase();
     if (!code) return { ok: false, error: 'Enter a code.' };
     const entry = db.codes.find(c => c.code === code);
@@ -46,10 +42,12 @@ module.exports = {
     entry.used = true;
     entry.usedBy = user.username;
     entry.usedAt = new Date().toISOString();
-    save();
+    await save(db);
     return { ok: true };
   },
-  generate(n) {
+  async generate(n) {
+    await checkSeed();
+    const db = await load();
     const count = Math.max(1, Math.min(50, parseInt(n) || 1));
     const out = [];
     for (let i = 0; i < count; i++) {
@@ -59,7 +57,7 @@ module.exports = {
       db.codes.push(entry);
       out.push(entry);
     }
-    save();
+    await save(db);
     return out;
   }
 };

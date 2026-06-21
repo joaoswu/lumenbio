@@ -66,8 +66,8 @@ app.use('/api/bio', bioRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/billing', billing.router);
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', users: store.count(), remaining: store.remaining(), uptime: process.uptime() });
+app.get('/health', async (_req, res) => {
+  res.json({ status: 'ok', users: await store.count(), remaining: await store.remaining(), uptime: process.uptime() });
 });
 
 // ---- Pages ----
@@ -75,12 +75,16 @@ const sendPage = (dir, file = 'index.html') => (_req, res) =>
   res.sendFile(path.join(PUBLIC, dir, file));
 
 // Custom domains (Premium): a mapped domain's "/" serves that user's bio.
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   if (req.method !== 'GET' || req.path !== '/') return next();
   const host = (req.hostname || '').toLowerCase();
   if (!host || ['localhost', '127.0.0.1', '0.0.0.0'].includes(host)) return next();
-  const user = store.findByDomain(host);
-  if (user) return serveBio(user, req, res);
+  try {
+    const user = await store.findByDomain(host);
+    if (user) return await serveBio(user, req, res);
+  } catch(e) {
+    console.error('Custom domain error', e);
+  }
   next();
 });
 
@@ -128,19 +132,20 @@ var d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'Wrong passwo
 </body></html>`;
 }
 
-function serveBio(user, req, res) {
+async function serveBio(user, req, res) {
   const pp = user.config.passwordProtect;
   const isPreview = !!req.query.preview;
 
   if (pp && pp.enabled && pp.hash && !isPreview) {
     const cookie = req.cookies && req.cookies['lu_' + user.username];
-    if (cookie !== unlockToken(user.username)) {
+    const expectedToken = await unlockToken(user.username);
+    if (cookie !== expectedToken) {
       return res.set('Cache-Control', 'no-cache').send(passwordGateHtml(user.username));
     }
   }
 
-  const views = isPreview ? (user.views || 0) : store.incrementViews(user.username);
-  if (!isPreview) analytics.record(user.username, req.get('referer'), req.hostname);
+  const views = isPreview ? (user.views || 0) : await store.incrementViews(user.username);
+  if (!isPreview) await analytics.record(user.username, req.get('referer'), req.hostname);
 
   const cfg = publicConfig(user.config); // strips password hash
   cfg.views = views;
@@ -173,10 +178,15 @@ function bioNotFound(res, username) {
 <p><a href="/">← Back to Lumenbio</a></p></div></body></html>`);
 }
 
-app.get('/u/:username', (req, res) => {
-  const user = store.findByUsername(req.params.username);
-  if (!user) return bioNotFound(res, req.params.username);
-  serveBio(user, req, res);
+app.get('/u/:username', async (req, res) => {
+  try {
+    const user = await store.findByUsername(req.params.username);
+    if (!user) return bioNotFound(res, req.params.username);
+    await serveBio(user, req, res);
+  } catch (e) {
+    console.error('Route error:', e);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // Friendly alias: /@username -> /u/username
@@ -185,7 +195,11 @@ app.get('/@:username', (req, res) => res.redirect(302, '/u/' + req.params.userna
 // Unknown routes fall back to the landing page (SPA-style).
 app.get('*', sendPage('landing'));
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`\nLumenbio running on http://localhost:${PORT}`);
-  console.log(`Users: ${store.count()}/${store.MAX_USERS}\n`);
+  try {
+    console.log(`Users: ${await store.count()}/${store.MAX_USERS}\n`);
+  } catch (e) {
+    console.log(`Failed to fetch user count from KV.\n`);
+  }
 });

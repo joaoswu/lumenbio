@@ -34,7 +34,7 @@ router.get('/config', (_req, res) => {
 
 router.post('/checkout', authRequired, async (req, res) => {
   if (!stripe) return res.status(503).json({ error: 'Card payments are not configured on this server.' });
-  const u = store.findById(req.user.id);
+  const u = await store.findById(req.user.id);
   if (!u) return res.status(404).json({ error: 'User not found' });
   if (u.premium) return res.json({ url: origin(req) + '/dashboard' });
 
@@ -64,8 +64,8 @@ async function successHandler(req, res) {
     const session = await stripe.checkout.sessions.retrieve(id);
     const paid = session && (session.payment_status === 'paid' || session.status === 'complete');
     const userId = session && (session.client_reference_id || (session.metadata && session.metadata.userId));
-    if (paid && userId && store.findById(userId)) {
-      store.update(userId, { premium: true });
+    if (paid && userId && (await store.findById(userId))) {
+      await store.update(userId, { premium: true });
       return res.redirect('/dashboard?upgraded=1');
     }
   } catch (e) {
@@ -75,7 +75,7 @@ async function successHandler(req, res) {
 }
 
 // Raw-body webhook (mounted with express.raw in index.js).
-function webhookHandler(req, res) {
+async function webhookHandler(req, res) {
   if (!stripe) return res.status(200).end();
   let event = req.body;
   if (WEBHOOK_SECRET) {
@@ -91,7 +91,7 @@ function webhookHandler(req, res) {
   if (event.type === 'checkout.session.completed') {
     const s = event.data.object;
     const userId = s.client_reference_id || (s.metadata && s.metadata.userId);
-    if (userId && store.findById(userId)) store.update(userId, { premium: true });
+    if (userId && (await store.findById(userId))) await store.update(userId, { premium: true });
   }
   res.json({ received: true });
 }

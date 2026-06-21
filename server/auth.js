@@ -19,15 +19,16 @@ const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: 'To
 const redeemLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 15, message: 'Too many code attempts. Try again later.' });
 
 // Persisted secret so sessions survive restarts (shared with the unlock token).
-const JWT_SECRET = require('./secret').SECRET;
+const { getSecret } = require('./secret');
 
 const COOKIE = 'lumen_token';
 const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const RESERVED = ['admin', 'login', 'signup', 'dashboard', 'api', 'u', 'health', 'shared', 'css', 'js', 'assets', 'static', 'lumenbio', 'about', 'settings', 'logout'];
 
-function sign(user) {
-  return jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '30d' });
+async function sign(user) {
+  const secret = await getSecret();
+  return jwt.sign({ id: user.id, username: user.username }, secret, { expiresIn: '30d' });
 }
 
 function setAuthCookie(res, token) {
@@ -39,16 +40,25 @@ function setAuthCookie(res, token) {
   });
 }
 
-function authOptional(req, _res, next) {
+async function authOptional(req, res, next) {
   const token = req.cookies && req.cookies[COOKIE];
-  if (token) { try { req.user = jwt.verify(token, JWT_SECRET); } catch (e) { /* ignore */ } }
+  if (token) { 
+    try { 
+      const secret = await getSecret();
+      req.user = jwt.verify(token, secret); 
+    } catch (e) { /* ignore */ } 
+  }
   next();
 }
 
-function authRequired(req, res, next) {
+async function authRequired(req, res, next) {
   const token = req.cookies && req.cookies[COOKIE];
   if (!token) return res.status(401).json({ error: 'Not authenticated' });
-  try { req.user = jwt.verify(token, JWT_SECRET); next(); }
+  try { 
+    const secret = await getSecret();
+    req.user = jwt.verify(token, secret); 
+    next(); 
+  }
   catch (e) { res.status(401).json({ error: 'Session expired, please log in again.' }); }
 }
 
@@ -71,18 +81,18 @@ router.post('/signup', signupLimiter, async (req, res) => {
     if (password.length < 8 || strength.score < 2) {
       return res.status(400).json({ error: 'Password is too weak — use 8+ characters with a mix of letters, numbers and symbols.' });
     }
-    if (store.isFull()) {
-      return res.status(403).json({ error: 'Lumenbio is at capacity (1000 users) right now. Please check back soon!' });
+    if (await store.isFull()) {
+      return res.status(403).json({ error: 'Lumenbio is at capacity right now. Please check back soon!' });
     }
-    if (store.findByUsername(username)) {
+    if (await store.findByUsername(username)) {
       return res.status(409).json({ error: 'That username is already taken.' });
     }
-    if (store.findByEmail(email)) {
+    if (await store.findByEmail(email)) {
       return res.status(409).json({ error: 'That email is already registered.' });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = store.create({
+    const user = await store.create({
       id: crypto.randomUUID(),
       username,
       email,
@@ -93,7 +103,7 @@ router.post('/signup', signupLimiter, async (req, res) => {
       config: defaultConfig(username)
     });
 
-    setAuthCookie(res, sign(user));
+    setAuthCookie(res, await sign(user));
     res.json({ success: true, username: user.username });
   } catch (e) {
     console.error('Signup error:', e);
@@ -106,13 +116,14 @@ router.post('/login', loginLimiter, async (req, res) => {
     const identifier = String(req.body.identifier || '').trim().toLowerCase();
     const password = String(req.body.password || '');
 
-    const user = store.findByUsername(identifier) || store.findByEmail(identifier);
+    let user = await store.findByUsername(identifier);
+    if (!user) user = await store.findByEmail(identifier);
     if (!user) return res.status(401).json({ error: 'Invalid username/email or password.' });
 
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) return res.status(401).json({ error: 'Invalid username/email or password.' });
 
-    setAuthCookie(res, sign(user));
+    setAuthCookie(res, await sign(user));
     res.json({ success: true, username: user.username });
   } catch (e) {
     console.error('Login error:', e);
@@ -125,8 +136,8 @@ router.post('/logout', (_req, res) => {
   res.json({ success: true });
 });
 
-router.get('/account', authRequired, (req, res) => {
-  const u = store.findById(req.user.id);
+router.get('/account', authRequired, async (req, res) => {
+  const u = await store.findById(req.user.id);
   if (!u) return res.status(404).json({ error: 'User not found' });
   res.json({
     username: u.username,
@@ -139,25 +150,25 @@ router.get('/account', authRequired, (req, res) => {
   });
 });
 
-router.post('/redeem', redeemLimiter, authRequired, (req, res) => {
-  const u = store.findById(req.user.id);
+router.post('/redeem', redeemLimiter, authRequired, async (req, res) => {
+  const u = await store.findById(req.user.id);
   if (!u) return res.status(404).json({ error: 'User not found' });
   const code = String(req.body.code || '').trim().toLowerCase();
   if (!code) return res.status(400).json({ error: 'Enter a code.' });
   if (u.premium) return res.json({ success: true, premium: true, already: true });
-  const result = codes.redeem(code, u);
+  const result = await codes.redeem(code, u);
   if (!result.ok) return res.status(400).json({ error: result.error });
-  store.update(u.id, { premium: true });
+  await store.update(u.id, { premium: true });
   res.json({ success: true, premium: true });
 });
 
-router.get('/me', authOptional, (req, res) => {
-  if (!req.user) return res.json({ user: null, remaining: store.remaining() });
-  const u = store.findById(req.user.id);
-  if (!u) return res.json({ user: null, remaining: store.remaining() });
+router.get('/me', authOptional, async (req, res) => {
+  if (!req.user) return res.json({ user: null, remaining: await store.remaining() });
+  const u = await store.findById(req.user.id);
+  if (!u) return res.json({ user: null, remaining: await store.remaining() });
   res.json({
-    user: { username: u.username, email: u.email, views: u.views || 0, premium: !!u.premium, isAdmin: store.isAdmin(u) },
-    remaining: store.remaining()
+    user: { username: u.username, email: u.email, views: u.views || 0, premium: !!u.premium, isAdmin: await store.isAdmin(u) },
+    remaining: await store.remaining()
   });
 });
 

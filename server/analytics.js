@@ -1,26 +1,12 @@
-/**
- * Per-user bio analytics — daily view counts + top referrers (data/analytics.json).
- */
-const fs = require('fs');
-const path = require('path');
+const { kv } = require('@vercel/kv');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const FILE = path.join(DATA_DIR, 'analytics.json');
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-
-function load() {
-  try { return JSON.parse(fs.readFileSync(FILE, 'utf8')); }
+async function load() {
+  try { return (await kv.get('lumen_analytics')) || {}; }
   catch (e) { return {}; }
 }
-let db = load();
-let dirty = false;
-function scheduleSave() {
-  if (dirty) return;
-  dirty = true;
-  setTimeout(() => {
-    try { fs.writeFileSync(FILE, JSON.stringify(db), 'utf8'); } catch (e) {}
-    dirty = false;
-  }, 1500);
+
+async function save(db) {
+  try { await kv.set('lumen_analytics', db); } catch (e) {}
 }
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -32,9 +18,10 @@ function refDomain(referer) {
 }
 
 module.exports = {
-  record(username, referer, selfHost) {
+  async record(username, referer, selfHost) {
     if (!username) return;
     const u = String(username).toLowerCase();
+    const db = await load();
     const entry = db[u] || (db[u] = { days: {}, referrers: {} });
     const d = today();
     entry.days[d] = (entry.days[d] || 0) + 1;
@@ -46,11 +33,13 @@ module.exports = {
     let dom = refDomain(referer);
     if (selfHost && dom === String(selfHost).toLowerCase()) dom = 'direct'; // ignore internal nav
     entry.referrers[dom] = (entry.referrers[dom] || 0) + 1;
-    scheduleSave();
+    
+    await save(db);
   },
 
-  get(username) {
+  async get(username) {
     const u = String(username || '').toLowerCase();
+    const db = await load();
     const entry = db[u] || { days: {}, referrers: {} };
 
     // last 30 days (oldest -> newest), zero-filled

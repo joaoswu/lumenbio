@@ -1,30 +1,30 @@
-/**
- * Single source of the app secret (persisted at data/.jwt-secret).
- * Used for JWT signing and the page-unlock HMAC token.
- */
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
-
-const dir = path.join(__dirname, '..', 'data');
-const file = path.join(dir, '.jwt-secret');
+const { kv } = require('@vercel/kv');
 
 let SECRET = process.env.JWT_SECRET;
-if (!SECRET) {
+
+async function getSecret() {
+  if (SECRET) return SECRET;
   try {
-    if (fs.existsSync(file)) SECRET = fs.readFileSync(file, 'utf8').trim();
-    else {
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      SECRET = crypto.randomBytes(32).toString('hex');
-      fs.writeFileSync(file, SECRET, 'utf8');
+    const val = await kv.get('jwt-secret');
+    if (val) {
+      SECRET = val;
+      return SECRET;
     }
-  } catch (e) {
     SECRET = crypto.randomBytes(32).toString('hex');
+    await kv.set('jwt-secret', SECRET);
+    return SECRET;
+  } catch (e) {
+    console.error('Failed to get/set JWT secret from KV, using ephemeral:', e);
+    SECRET = crypto.randomBytes(32).toString('hex');
+    return SECRET;
   }
 }
 
 module.exports = {
-  SECRET,
-  unlockToken: (username) =>
-    crypto.createHmac('sha256', SECRET).update('unlock:' + String(username).toLowerCase()).digest('hex')
+  getSecret,
+  unlockToken: async (username) => {
+    const s = await getSecret();
+    return crypto.createHmac('sha256', s).update('unlock:' + String(username).toLowerCase()).digest('hex');
+  }
 };

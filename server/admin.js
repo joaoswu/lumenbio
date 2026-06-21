@@ -9,39 +9,39 @@ const { authRequired } = require('./auth');
 
 const router = express.Router();
 
-function adminRequired(req, res, next) {
-  const u = store.findById(req.user.id);
-  if (!u || !store.isAdmin(u)) return res.status(403).json({ error: 'Admins only.' });
+async function adminRequired(req, res, next) {
+  const u = await store.findById(req.user.id);
+  if (!u || !(await store.isAdmin(u))) return res.status(403).json({ error: 'Admins only.' });
   req.adminUser = u;
   next();
 }
 
 router.use(authRequired, adminRequired);
 
-router.get('/users', (_req, res) => {
-  res.json({
-    users: store.all().map(u => ({
-      username: u.username,
-      email: u.email,
-      premium: !!u.premium,
-      admin: store.isAdmin(u),
-      views: u.views || 0,
-      createdAt: u.createdAt
-    }))
-  });
+router.get('/users', async (_req, res) => {
+  const allUsers = await store.all();
+  const usersWithAdmin = await Promise.all(allUsers.map(async u => ({
+    username: u.username,
+    email: u.email,
+    premium: !!u.premium,
+    admin: await store.isAdmin(u),
+    views: u.views || 0,
+    createdAt: u.createdAt
+  })));
+  res.json({ users: usersWithAdmin });
 });
 
-router.post('/premium', (req, res) => {
+router.post('/premium', async (req, res) => {
   const username = String(req.body.username || '').trim().toLowerCase();
   const premium = !!req.body.premium;
-  const target = store.findByUsername(username);
+  const target = await store.findByUsername(username);
   if (!target) return res.status(404).json({ error: 'User not found.' });
-  store.update(target.id, { premium });
+  await store.update(target.id, { premium });
   res.json({ success: true, username, premium });
 });
 
-router.get('/codes', (_req, res) => res.json({ codes: codes.list() }));
+router.get('/codes', async (_req, res) => res.json({ codes: await codes.list() }));
 
-router.post('/codes', (req, res) => res.json({ success: true, codes: codes.generate(req.body.count) }));
+router.post('/codes', async (req, res) => res.json({ success: true, codes: await codes.generate(req.body.count) }));
 
 module.exports = { router };
