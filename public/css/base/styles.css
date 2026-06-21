@@ -47,6 +47,12 @@
 
 html {
     -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+}
+html::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari/Opera */
 }
 
 body {
@@ -60,6 +66,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
     transform: translateZ(0);
     backface-visibility: hidden;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+}
+body::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari/Opera */
 }
 
 #background-overlay {
