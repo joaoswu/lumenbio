@@ -294,25 +294,25 @@
     padding: 24px;
     transition: transform 0.35s var(--ease), border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.5s var(--ease);
 }
-.feature:hover { transform: translateY(-6px); border-color: color-mix(in srgb, var(--c, var(--accent)) 50%, transparent); box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px color-mix(in srgb, var(--c, var(--accent)) 25%, transparent); }
+.feature:hover { transform: translateY(-6px); border-color: color-mix(in srgb, var(--accent) 50%, transparent); box-shadow: 0 20px 50px rgba(0,0,0,0.45), 0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent); }
 .feature-icon {
     width: 48px; height: 48px;
     border-radius: 13px;
     display: grid; place-items: center;
     font-size: 1.25rem;
     margin-bottom: 16px;
-    color: var(--c, var(--accent));
-    background: color-mix(in srgb, var(--c, var(--accent)) 16%, transparent);
-    border: 1px solid color-mix(in srgb, var(--c, var(--accent)) 35%, transparent);
-    box-shadow: 0 0 22px color-mix(in srgb, var(--c, var(--accent)) 25%, transparent);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--accent) 18%, transparent);
     transition: transform 0.4s var(--ease), box-shadow 0.3s ease;
 }
 .feature:hover .feature-icon {
     transform: translateY(-3px) scale(1.1) rotate(-6deg);
-    box-shadow: 0 0 32px color-mix(in srgb, var(--c, var(--accent)) 45%, transparent);
+    box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .feature h3 { transition: color 0.3s ease; }
-.feature:hover h3 { color: var(--c, var(--accent)); }
+.feature:hover h3 { color: var(--accent); }
 .feature h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }
 .feature p { color: var(--text-2); font-size: 0.88rem; font-weight: 300; }
 
