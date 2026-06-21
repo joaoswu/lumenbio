@@ -103,6 +103,8 @@ body::-webkit-scrollbar {
 .tilt-wrap {
     transform-style: preserve-3d;
     will-change: transform;
+    width: 384px;
+    max-width: 100%;
 }
 
 /* Reusable glass surface */
