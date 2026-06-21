@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/css/base/styles.css?v=1.1.20">
+    <link rel="stylesheet" href="/css/components/effects.css?v=1.1.20">
+    <link rel="stylesheet" href="/css/components/welcome.css?v=1.1.20">
+    <style id="lumen-custom-css">/*__CUSTOM_CSS__*/</style>
+    <script type="application/json" id="lumen-config">/*__LUMEN_CONFIG__*/</script>
+</head>
+<body>
+
+    <!-- Last.fm Widget - Top Left Corner -->
+    <div class="corner-widget corner-tl">
+        <div class="lastfm-widget glass">
+            <div class="widget-head">
+                <span class="eq" id="lastfm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="widget-title" id="lastfm-title">Listening to</span>
+            </div>
+            <div class="lastfm-body">
+                <div class="album-art-wrap">
+                    <img class="album-art" id="album-art" alt="" loading="lazy">
+                    <i class="fas fa-music album-art-fallback" aria-hidden="true"></i>
+                </div>
+                <div class="lastfm-meta">
+                    <div class="track-name" id="track-name">Loading track…</div>
+                    <div class="artist-name" id="artist-name">Last.fm</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Overlay -->
+    <div id="background-overlay"></div>
+
+    <!-- Ambient accent glow -->
+    <div id="accent-glow" aria-hidden="true"></div>
+
+    <!-- Main Content Container -->
+    <div id="main-content">
+        <main class="page">
+          <div class="tilt-wrap">
+            <div class="card-stack fade-in">
+
+                <!-- Profile banner (Premium) -->
+                <div class="card-banner" id="card-banner" hidden><img id="profile-banner" alt=""></div>
+
+                <!-- Profile Section -->
+                <div class="profile-container">
+                    <div class="profile-image-wrapper">
+                        <img src="" alt="Profile" class="profile-image" data-placeholder="Loading…">
+                    </div>
+                    <div class="profile-info">
+                        <h2 class="profile-name" id="profile-name"></h2>
+                        <h1 class="profile-description" id="profile-description"></h1>
+                        <div class="profile-tags" id="profile-tags"></div>
+                    </div>
+                </div>
+
+                <!-- Social Icons -->
+                <div class="social-grid">
+                    <a href="#" class="social-icon" data-social="github" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-icon" data-social="twitter" aria-label="Twitter/X"><i class="fab fa-x-twitter"></i></a>
+                    <a href="#" class="social-icon" data-social="lastfm" aria-label="Last.fm"><i class="fab fa-lastfm"></i></a>
+                    <a href="#" class="social-icon" data-social="osu" aria-label="osu!"><i class="fas fa-circle-dot"></i></a>
+                    <a href="#" class="social-icon" data-social="vrchat" aria-label="VRChat"><i class="fas fa-vr-cardboard"></i></a>
+                    <a href="#" class="social-icon" data-social="steam" aria-label="Steam"><i class="fab fa-steam"></i></a>
+                    <a href="#" class="social-icon" data-social="instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon" data-social="tiktok" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="#" class="social-icon" data-social="namemc" aria-label="NameMC"><i class="fas fa-cube"></i></a>
+                    <a href="#" class="social-icon" data-social="youtube" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+
+                <!-- Custom links (Premium) -->
+                <div class="custom-links" id="custom-links"></div>
+
+                <!-- Status Panel -->
+                <div class="status-panel">
+                    <div class="status-header">
+                        <span class="status-title">System Status</span>
+                        <div class="status-indicator">
+                            <div class="status-dot active" id="discord-status-dot"></div>
+                            <span class="status-text status-online" id="discord-status-text">Loading…</span>
+                        </div>
+                    </div>
+
+                    <div class="divider-thin"></div>
+
+                    <div class="status-info">
+                        <div class="status-row">
+                            <span class="status-label">Location</span>
+                            <span class="status-value location-text"></span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">My Time</span>
+                            <span class="status-value time-value">
+                                <span id="current-time">--:--:--</span>
+                                <small class="tz-diff" id="tz-diff"></small>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="discord-activity" id="discord-activity" hidden>
+                        <div class="activity-art-wrap">
+                            <img class="activity-art" id="activity-art" alt="" loading="lazy">
+                            <i class="fas fa-gamepad activity-art-fallback" aria-hidden="true"></i>
+                        </div>
+                        <div class="activity-meta">
+                            <div class="activity-kind" id="activity-kind"></div>
+                            <div class="activity-line1" id="activity-line1"></div>
+                            <div class="activity-line2" id="activity-line2"></div>
+                            <div class="activity-progress" id="activity-progress" hidden>
+                                <div class="activity-progress-bar" id="activity-progress-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+          </div>
+        </main>
+    </div>
+
+    <!-- Now Playing dock (slides up after entry when music is enabled) -->
+    <div class="np-dock" id="np-dock">
+        <canvas class="np-wave" id="np-wave" aria-hidden="true"></canvas>
+        <div class="np-inner">
+            <div class="np-art">
+                <img id="np-art-img" alt="" />
+                <i class="fas fa-music np-art-fallback" aria-hidden="true"></i>
+            </div>
+            <div class="np-meta">
+                <div class="np-title" id="np-title">—</div>
+                <div class="np-artist" id="np-artist"></div>
+                <div class="np-progress" id="np-progress">
+                    <div class="np-progress-bar" id="np-progress-bar"></div>
+                </div>
+            </div>
+            <div class="np-controls">
+                <button class="np-btn" id="np-prev" aria-label="Previous track"><i class="fas fa-backward-step"></i></button>
+                <button class="np-btn np-play" id="np-play" aria-label="Play / pause"><i class="fas fa-play"></i></button>
+                <button class="np-btn" id="np-next" aria-label="Next track"><i class="fas fa-forward-step"></i></button>
+                <input type="range" class="np-vol" id="np-vol" min="0" max="100" value="50" aria-label="Volume">
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="divider"></div>
+        <span class="view-counter" id="view-counter" hidden>
+            <i class="fas fa-eye" aria-hidden="true"></i>
+            <span id="view-count">—</span> views
+        </span>
+        <p class="footer-text">© 2025 • music. connect. [people].</p>
+    </footer>
+
+    <!-- Branding credit (hidden for Premium users who remove it) -->
+    <a class="lumen-credit" id="lumen-credit" href="/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg>
+        Made with Lumenbio
+    </a>
+
+    <!-- Bio config (parsed from the JSON block above) -->
+    <script src="/js/config-loader.js?v=1.1.20"></script>
+
+    <!-- Vendor (self-hosted) -->
+    <script src="/js/vendor/particles.min.js?v=1.1.20"></script>
+
+    <!-- Modular JavaScript -->
+    <script src="/js/modules/fontManager.js?v=1.1.20"></script>
+    <script src="/js/modules/welcomeScreen.js?v=1.1.20"></script>
+    <script src="/js/modules/backgroundManager.js?v=1.1.20"></script>
+    <script src="/js/modules/effects.js?v=1.1.20"></script>
+    <script src="/js/modules/services.js?v=1.1.20"></script>
+    <script src="/js/modules/discordWidget.js?v=1.1.20"></script>
+    <script src="/js/modules/configurator.js?v=1.1.20"></script>
+    <script src="/js/modules/timeUtils.js?v=1.1.20"></script>
+    <script src="/js/modules/nowPlaying.js?v=1.1.20"></script>
+    <script src="/js/modules/profileImageManager.js?v=1.1.20"></script>
+    <script src="/js/modules/interactions.js?v=1.1.20"></script>
+    <script src="/js/modules/viewCounter.js?v=1.1.20"></script>
+    <script src="/js/main.js?v=1.1.20"></script>
+</body>
+</html>

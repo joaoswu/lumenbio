@@ -1,0 +1,247 @@
+/* ============================================================
+   Lumenbio — shared design system
+   ============================================================ */
+:root {
+    --bg: #0b0809;
+    --bg-2: #130d0f;
+    --text: #f3eded;
+    --text-2: #a59a9c;
+    --text-3: #6e6264;
+    --accent: #c4313a;
+    --accent-2: #9b1d2b;
+    --accent-3: #6f1119;
+
+    --glass-bg: rgba(255, 255, 255, 0.045);
+    --glass-bg-2: rgba(255, 255, 255, 0.07);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 16px 50px rgba(0, 0, 0, 0.5);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    --radius: 16px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --font: 'Poppins', system-ui, -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Ambient background */
+.lumen-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+        radial-gradient(50% 40% at 15% 8%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 62%),
+        radial-gradient(45% 45% at 88% 18%, color-mix(in srgb, var(--accent-2) 16%, transparent) 0%, transparent 62%),
+        radial-gradient(60% 50% at 50% 112%, color-mix(in srgb, var(--accent-3) 16%, transparent) 0%, transparent 60%);
+    opacity: 0.5;
+    animation: bg-breathe 26s ease-in-out infinite alternate;
+    will-change: transform;
+}
+.lumen-grid {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(circle at 50% 40%, #000 0%, transparent 75%);
+    -webkit-mask-image: radial-gradient(circle at 50% 40%, #000 0%, transparent 75%);
+}
+@keyframes bg-breathe {
+    0%   { transform: scale(1) translateY(0); }
+    100% { transform: scale(1.04) translateY(-1%); }
+}
+
+.glass {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow), var(--glass-highlight);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+}
+
+/* ============================================================
+   Dynamic-island navbar
+   ============================================================ */
+.nav-island {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    animation: island-drop 0.8s var(--ease) backwards;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 8px 8px 18px;
+    border-radius: 999px;
+    background: rgba(12, 12, 16, 0.6);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow), var(--glass-highlight);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    transition: gap 0.4s var(--ease), padding 0.4s var(--ease), box-shadow 0.4s var(--ease), transform 0.4s var(--ease);
+    max-width: calc(100vw - 24px);
+}
+.nav-island:hover { box-shadow: 0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), var(--glass-highlight); }
+.nav-island.scrolled { top: 12px; transform: translateX(-50%) scale(0.97); }
+
+@keyframes island-drop {
+    from { opacity: 0; transform: translateX(-50%) translateY(-18px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.nav-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+.nav-brand .logo {
+    width: 22px; height: 22px;
+    display: grid; place-items: center;
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #0b0b10;
+    font-size: 13px;
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.nav-tabs {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 4px;
+}
+.nav-indicator {
+    position: absolute;
+    top: 50%;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--glass-bg-2);
+    border: 1px solid var(--glass-border);
+    transform: translateY(-50%);
+    transition: left 0.35s var(--ease), width 0.35s var(--ease), opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+.nav-tab {
+    position: relative;
+    z-index: 1;
+    padding: 7px 16px;
+    border-radius: 999px;
+    color: var(--text-2);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color 0.25s ease;
+}
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--text); }
+.nav-tab i { margin-right: 6px; font-size: 0.8rem; opacity: 0.85; }
+
+.nav-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, var(--accent-3)));
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 45%, transparent);
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), filter 0.25s ease;
+}
+.nav-cta:hover { transform: translateY(-2px); box-shadow: 0 10px 28px color-mix(in srgb, var(--accent) 60%, transparent); filter: brightness(1.05); }
+.nav-cta:active { transform: translateY(0) scale(0.97); }
+
+@media (max-width: 640px) {
+    .nav-brand .brand-text { display: none; }
+    .nav-tab { padding: 7px 11px; font-size: 0.8rem; }
+    .nav-tab i { margin-right: 0; }
+    .nav-tab .tab-text { display: none; }
+    .nav-island { gap: 6px; padding: 7px 7px 7px 12px; }
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 13px 26px;
+    border-radius: 12px;
+    font-family: var(--font);
+    font-size: 0.92rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s ease, border-color 0.25s ease;
+}
+/* Shine sweep on hover */
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -160%;
+    width: 55%;
+    height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    transform: skewX(-20deg);
+    pointer-events: none;
+    transition: left 0.7s var(--ease);
+}
+.btn:hover::after { left: 160%; }
+.btn > * { position: relative; z-index: 1; }
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--accent-3)));
+    color: #fff;
+    box-shadow: 0 8px 26px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 34px color-mix(in srgb, var(--accent) 55%, transparent); }
+.btn-primary:active { transform: translateY(0) scale(0.98); }
+.btn-ghost {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    color: var(--text);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+.btn-ghost:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.btn-lg { padding: 16px 32px; font-size: 1rem; border-radius: 14px; }
+
+/* Note: a global prefers-reduced-motion override used to live here, but the
+   embedded preview forces reduced-motion on, which made every infinite loop
+   run at hyperspeed. Animations are intentionally kept on for Lumenbio's UI. */

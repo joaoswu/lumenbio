@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meow — Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/setup/setup.css?v=1.1.5" />
+</head>
+<body>
+<div class="bg-glow" aria-hidden="true"></div>
+<div class="wrapper">
+  <header>
+    <h1>Meow Setup</h1>
+    <p>Configure your page once. After this, setup is permanently locked.</p>
+  </header>
+
+  <div class="card">
+    <div class="steps">
+      <div class="step-tab active" id="tab-1"><span class="step-num">1</span> Profile</div>
+      <div class="step-tab" id="tab-2"><span class="step-num">2</span> Social</div>
+      <div class="step-tab" id="tab-3"><span class="step-num">3</span> Connect</div>
+      <div class="step-tab" id="tab-4"><span class="step-num">4</span> Look</div>
+      <div class="step-tab" id="tab-5"><span class="step-num">5</span> Effects</div>
+      <div class="step-tab" id="tab-6"><span class="step-num">6</span> Finish</div>
+    </div>
+    <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+
+    <form id="setup-form" enctype="multipart/form-data" novalidate>
+
+      <!-- STEP 1 — PROFILE -->
+      <div class="panel active" id="panel-1">
+        <div class="section-title">Profile Information</div>
+        <div class="field-group">
+          <div class="field">
+            <label>Display Name <span>*</span></label>
+            <input type="text" name="name" id="name" placeholder="Akryst" required />
+          </div>
+          <div class="field">
+            <label>Description <span>*</span></label>
+            <textarea name="description" id="description" placeholder="VR Enthusiast • Music Lover" required></textarea>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Timezone <span>*</span></label>
+              <select name="timezone" id="timezone" required></select>
+            </div>
+            <div class="field">
+              <label>Footer Text</label>
+              <input type="text" name="footer" id="footer" placeholder="Made with ❤️ by You" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Tags <small class="hint-inline">— comma separated, shown as chips under your name</small></label>
+            <input type="text" name="profileTags" id="profileTags" placeholder="Developer, Editor, Gamer" />
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-label">
+            Typewriter effect
+            <small>Type out your description letter by letter</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" name="typewriterEnabled" id="typewriterEnabled" value="true" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="section-title" style="margin-top:28px;">Welcome Screen</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            Show welcome screen
+            <small>An entrance splash visitors click before seeing your page</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" name="welcomeEnabled" id="welcomeEnabled" value="true" checked onchange="toggleSection('welcome-fields', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="welcome-fields" style="margin-top:16px;">
+          <div class="field">
+            <label>Welcome Text</label>
+            <input type="text" name="welcomeText" id="welcomeText" value="Hey! 👋" />
+          </div>
+        </div>
+
+        <div class="section-title">Profile Picture</div>
+        <div class="upload-box" id="profile-box">
+          <input type="file" name="profile" id="profile-file" accept="image/jpeg,image/png,image/gif,image/webp" />
+          <img class="upload-preview" id="profile-preview" alt="Profile preview" />
+          <div class="icon" id="profile-icon">🖼️</div>
+          <p id="profile-hint">Click to upload your profile picture<br><small>JPG, PNG, GIF, WEBP — max 20 MB</small></p>
+        </div>
+
+        <div class="nav-row">
+          <span></span>
+          <button type="button" class="btn btn-primary" onclick="goTo(2)">Next →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 — SOCIAL -->
+      <div class="panel" id="panel-2">
+        <div class="section-title">Social Links <small class="hint-inline"> — leave blank to hide</small></div>
+        <div class="field-group">
+          <div class="row">
+            <div class="field"><label>GitHub</label><input type="url" name="github" placeholder="https://github.com/username" /></div>
+            <div class="field"><label>Twitter / X</label><input type="url" name="twitter" placeholder="https://x.com/username" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>Steam</label><input type="url" name="steam" placeholder="https://steamcommunity.com/id/id" /></div>
+            <div class="field"><label>VRChat</label><input type="url" name="vrchat" placeholder="https://vrchat.com/home/user/usr_..." /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>osu!</label><input type="url" name="osu" placeholder="https://osu.ppy.sh/users/id" /></div>
+            <div class="field"><label>Last.fm profile</label><input type="url" name="lastfmProfile" placeholder="https://www.last.fm/user/username" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>Instagram</label><input type="url" name="instagram" placeholder="https://instagram.com/username" /></div>
+            <div class="field"><label>TikTok</label><input type="url" name="tiktok" placeholder="https://tiktok.com/@username" /></div>
+          </div>
+          <div class="row">
+            <div class="field"><label>YouTube</label><input type="url" name="youtube" placeholder="https://youtube.com/@username" /></div>
+            <div class="field"><label>NameMC</label><input type="url" name="namemc" placeholder="https://namemc.com/profile/username" /></div>
+          </div>
+        </div>
+        <div class="nav-row">
+          <button type="button" class="btn btn-ghost" onclick="goTo(1)">← Back</button>
+          <button type="button" class="btn btn-primary" onclick="goTo(3)">Next →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 — CONNECT -->
+      <div class="panel" id="panel-3">
+        <div class="section-title">Discord (via Lanyard)</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            Enable Discord status
+            <small>Shows your real-time status & rich presence</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" name="discordEnabled" id="discordEnabled" value="true" onchange="toggleSection('discord-fields', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="discord-fields" style="display:none; margin-top:16px;">
+          <div class="field">
+            <label>Discord User ID <span>*</span></label>
+            <input type="text" name="discordUserId" id="discordUserId" placeholder="123456789012345678" />
+            <small class="field-hint">
+              Enable Developer Mode → right-click your avatar → Copy User ID. Also join <a href="https://discord.gg/lanyard" target="_blank">discord.gg/lanyard</a>.
+            </small>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:28px;">Last.fm</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            Enable Last.fm now playing
+            <small>Shows the track you're currently listening to</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" name="lastfmEnabled" id="lastfmEnabled" value="true" onchange="toggleSection('lastfm-fields', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="lastfm-fields" style="display:none; margin-top:16px;">
+          <div class="row">
+            <div class="field">
+              <label>API Key <span>*</span></label>
+              <input type="text" name="lastfmApiKey" id="lastfmApiKey" placeholder="97cee68c..." />
+              <small class="field-hint">Get one at <a href="https://www.last.fm/api/account/create" target="_blank">last.fm/api/account/create</a></small>
+            </div>
+            <div class="field">
+              <label>Username <span>*</span></label>
+              <input type="text" name="lastfmUsername" id="lastfmUsername" placeholder="yourusername" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:28px;">Rotating Locations</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            Enable location display
+            <small>Rotates through a list of "locations" on your page</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" name="locationsEnabled" id="locationsEnabled" value="true" onchange="toggleSection('locations-fields', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="locations-fields" style="display:none; margin-top:16px;">
+          <div class="field">
+            <label>Locations (one per line)</label>
+            <textarea name="locationsRaw" id="locationsRaw" placeholder="The Black Cat&#10;Popcorn Palace&#10;VRChat Home" style="min-height:100px"></textarea>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:28px;">Music Player</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            Enable music player
+            <small>A small audio player in the bottom-left corner</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" name="musicEnabled" id="musicEnabled" value="true" onchange="toggleSection('music-fields', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="music-fields" style="display:none; margin-top:16px;">
+          <div class="field">
+            <label>Songs</label>
+            <div class="upload-box upload-box-sm" id="songs-box">
+              <input type="file" name="songs" id="songs-file" accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg" multiple />
+              <div class="icon">🎵</div>
+              <p id="songs-hint">Click to upload one or more tracks<br><small>MP3, WAV, OGG — up to 10 files, 20 MB each</small></p>
+            </div>
+            <ul class="file-list" id="songs-list"></ul>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label">
+              Autoplay on entry
+              <small>Starts playing after the welcome screen</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" name="musicAutoplay" id="musicAutoplay" value="true" />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="field" style="margin-top:16px;">
+            <label>Default Volume — <span class="range-out" id="musicVolume-out">50</span>%</label>
+            <input type="range" class="range" name="musicVolume" id="musicVolume" min="0" max="100" step="1" value="50"
+                   oninput="document.getElementById('musicVolume-out').textContent=this.value" />
+          </div>
+        </div>
+
+        <div class="nav-row">
+          <button type="button" class="btn btn-ghost" onclick="goTo(2)">← Back</button>
+          <button type="button" class="btn btn-primary" onclick="goTo(4)">Next →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4 — LOOK -->
+      <div class="panel" id="panel-4">
+        <div class="section-title">Accent Color</div>
+        <div class="color-field">
+          <input type="color" name="accentColor" id="accentColor" value="#ffffff"
+                 oninput="document.getElementById('accentColor-hex').textContent=this.value.toUpperCase()" />
+          <div class="color-meta">
+            <div class="color-name">Theme accent</div>
+            <div class="color-hex" id="accentColor-hex">#FFFFFF</div>
+          </div>
+          <div class="swatches" id="accent-swatches">
+            <button type="button" class="swatch" style="--s:#ffffff" data-color="#ffffff" title="White"></button>
+            <button type="button" class="swatch" style="--s:#8b5cf6" data-color="#8b5cf6" title="Violet"></button>
+            <button type="button" class="swatch" style="--s:#22d3ee" data-color="#22d3ee" title="Cyan"></button>
+            <button type="button" class="swatch" style="--s:#f472b6" data-color="#f472b6" title="Pink"></button>
+            <button type="button" class="swatch" style="--s:#34d399" data-color="#34d399" title="Green"></button>
+            <button type="button" class="swatch" style="--s:#f59e0b" data-color="#f59e0b" title="Amber"></button>
+            <button type="button" class="swatch" style="--s:#ef4444" data-color="#ef4444" title="Red"></button>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:28px;">Background</div>
+        <div class="field">
+          <label>Background Type</label>
+          <select name="backgroundType" id="backgroundType" onchange="toggleBgUpload(this.value)">
+            <option value="image">Image</option>
+            <option value="video">Video (upload separately to public/assets/videos/)</option>
+          </select>
+        </div>
+        <div id="bg-upload-area">
+          <div class="upload-box" id="bg-box">
+            <input type="file" name="background" id="bg-file" accept="image/jpeg,image/png,image/gif,image/webp" />
+            <img class="upload-preview bg-preview" id="bg-preview" alt="Background preview" />
+            <div class="icon" id="bg-icon">🏔️</div>
+            <p id="bg-hint">Click to upload your background image<br><small>JPG, PNG, GIF, WEBP — max 20 MB</small></p>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:16px;">
+          <div class="field">
+            <label>Background Blur</label>
+            <input type="text" name="backgroundBlur" value="20px" placeholder="20px" />
+          </div>
+          <div class="field">
+            <label>Background Opacity — <span class="range-out" id="backgroundOpacity-out">0.3</span></label>
+            <input type="range" class="range" name="backgroundOpacity" id="backgroundOpacity" min="0" max="1" step="0.05" value="0.3"
+                   oninput="document.getElementById('backgroundOpacity-out').textContent=this.value" />
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:28px;">Font</div>
+        <div class="field">
+          <label>Font Family</label>
+          <select name="fontFamily">
+            <option value="Poppins" selected>Poppins</option>
+            <option value="Inter">Inter</option>
+            <option value="JetBrains Mono">JetBrains Mono</option>
+            <option value="Fira Code">Fira Code</option>
+            <option value="Source Code Pro">Source Code Pro</option>
+            <option value="Roboto Mono">Roboto Mono</option>
+          </select>
+        </div>
+
+        <div class="section-title" style="margin-top:28px;">Extras</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            Show visit counter
+            <small>A small "views" badge in the footer</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" name="viewCounterEnabled" id="viewCounterEnabled" value="true" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="nav-row">
+          <button type="button" class="btn btn-ghost" onclick="goTo(3)">← Back</button>
+          <button type="button" class="btn btn-primary" onclick="goTo(5)">Next →</button>
+        </div>
+      </div>
+
+      <!-- STEP 5 — EFFECTS -->
+      <div class="panel" id="panel-5">
+        <div class="section-title">Particles</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            Enable particles
+            <small>Floating particles drifting across the background</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" name="particlesEnabled" id="particlesEnabled" value="true" checked onchange="toggleSection('particles-fields', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="particles-fields" style="margin-top:16px;">
+          <div class="row">
+            <div class="field">
+              <label>Count — <span class="range-out" id="particlesCount-out">60</span></label>
+              <input type="range" class="range" name="particlesCount" id="particlesCount" min="0" max="160" step="5" value="60"
+                     oninput="document.getElementById('particlesCount-out').textContent=this.value" />
+            </div>
+            <div class="field">
+              <label>Speed — <span class="range-out" id="particlesSpeed-out">0.8</span></label>
+              <input type="range" class="range" name="particlesSpeed" id="particlesSpeed" min="0.1" max="3" step="0.1" value="0.8"
+                     oninput="document.getElementById('particlesSpeed-out').textContent=this.value" />
+            </div>
+          </div>
+          <div class="color-field" style="margin-top:8px;">
+            <input type="color" name="particlesColor" id="particlesColor" value="#ffffff"
+                   oninput="document.getElementById('particlesColor-hex').textContent=this.value.toUpperCase()" />
+            <div class="color-meta">
+              <div class="color-name">Particle color</div>
+              <div class="color-hex" id="particlesColor-hex">#FFFFFF</div>
+            </div>
+          </div>
+          <div class="toggle-row" style="margin-top:8px;">
+            <div class="toggle-label">
+              Connect particles
+              <small>Draw thin lines between nearby particles</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" name="particlesLinked" id="particlesLinked" value="true" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:28px;">Bloom / Glow</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            Enable bloom
+            <small>Soft glow around text, icons and your avatar</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" name="bloomEnabled" id="bloomEnabled" value="true" checked onchange="toggleSection('bloom-fields', this.checked)" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="bloom-fields" style="margin-top:16px;">
+          <div class="row">
+            <div class="field">
+              <label>Strength — <span class="range-out" id="bloomStrength-out">1</span></label>
+              <input type="range" class="range" name="bloomStrength" id="bloomStrength" min="0" max="2" step="0.1" value="1"
+                     oninput="document.getElementById('bloomStrength-out').textContent=this.value" />
+            </div>
+            <div class="field">
+              <label>Radius — <span class="range-out" id="bloomRadius-out">15</span>px</label>
+              <input type="range" class="range" name="bloomRadius" id="bloomRadius" min="0" max="60" step="1" value="15"
+                     oninput="document.getElementById('bloomRadius-out').textContent=this.value" />
+            </div>
+          </div>
+          <div class="toggle-row" style="margin-top:8px;">
+            <div class="toggle-label">
+              Pulse animation
+              <small>Gently animate the glow on your name</small>
+            </div>
+            <label class="switch">
+              <input type="checkbox" name="bloomPulse" id="bloomPulse" value="true" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:28px;">Interactions</div>
+        <div class="toggle-row">
+          <div class="toggle-label">
+            3D tilt
+            <small>The card gently tilts toward your cursor</small>
+          </div>
+          <label class="switch">
+            <input type="checkbox" name="tiltEnabled" id="tiltEnabled" value="true" checked />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="nav-row">
+          <button type="button" class="btn btn-ghost" onclick="goTo(4)">← Back</button>
+          <button type="button" class="btn btn-primary" onclick="goTo(6)">Next →</button>
+        </div>
+      </div>
+
+      <!-- STEP 6 — FINISH -->
+      <div class="panel" id="panel-6">
+        <div class="section-title">Review & Submit</div>
+        <p class="finish-note">
+          Everything looks good? Once you click <strong>Launch</strong>, the setup page will be permanently locked and you will be redirected to your live page.
+        </p>
+
+        <div id="review-box">Loading summary...</div>
+
+        <div class="error-box" id="error-box"></div>
+
+        <div class="nav-row">
+          <button type="button" class="btn btn-ghost" onclick="goTo(5)">← Back</button>
+          <button type="submit" class="btn btn-primary" id="submit-btn">🚀 Launch</button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<div id="overlay">
+  <div id="overlay-spinner" class="spinner"></div>
+  <h2 id="overlay-title">Setting up your page…</h2>
+  <p id="overlay-msg">Writing config, uploading files. Please wait.</p>
+</div>
+
+<script src="/setup/setup.js?v=1.1.5"></script>
+</body>
+</html>

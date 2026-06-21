@@ -1,0 +1,1052 @@
+/* ============================================================
+   Base + Design System
+   ============================================================ */
+:root {
+    /* Theme */
+    --color-primary: #ffffff;
+    --color-background: #000000;
+    --color-text: #ffffff;
+    --color-text-secondary: #9ca3af;
+    --color-text-muted: #6b7280;
+    --color-border: rgba(255, 255, 255, 0.10);
+    --color-dot: #39FF14;
+
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.045);
+    --glass-bg-strong: rgba(255, 255, 255, 0.07);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-blur: 16px;
+    --glass-radius: 16px;
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+
+    /* Status colors */
+    --status-online: #43b581;
+    --status-idle: #faa61a;
+    --status-dnd: #f04747;
+    --status-offline: #747f8d;
+
+    /* Background */
+    --background-blur: 20px;
+
+    /* Typography */
+    --font-mono: 'Poppins', sans-serif;
+
+    /* Transitions */
+    --transition-fast: 0.15s ease-out;
+    --transition-base: 0.3s ease-out;
+    --transition-slow: 0.5s ease-out;
+    --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-mono);
+    background-color: var(--color-background);
+    color: var(--color-text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+#background-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(120% 120% at 50% 0%, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.55) 100%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Ambient accent glow — soft drifting blobs tinted with the accent color */
+#accent-glow {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.45;
+    background:
+        radial-gradient(40% 35% at 18% 12%, color-mix(in srgb, var(--color-primary) 22%, transparent) 0%, transparent 70%),
+        radial-gradient(45% 40% at 85% 88%, color-mix(in srgb, var(--color-primary) 16%, transparent) 0%, transparent 70%);
+    animation: accent-drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes accent-drift {
+    0%   { transform: translate3d(-2%, -1%, 0) scale(1); }
+    100% { transform: translate3d(2%, 2%, 0) scale(1.08); }
+}
+
+/* 3D tilt layer */
+.tilt-wrap {
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+/* Reusable glass surface */
+.glass {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-radius);
+    box-shadow: var(--glass-shadow), var(--glass-highlight);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    position: relative;
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
+.page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.card-stack {
+    width: 100%;
+    max-width: 384px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+    padding: 32px 28px 26px;
+    border-radius: 24px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow), var(--glass-highlight);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    position: relative;
+    transition: box-shadow var(--transition-base);
+}
+
+/* Slow rotating accent glow halo behind the card */
+.card-stack::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 26px;
+    z-index: -1;
+    background: conic-gradient(from 0deg,
+        transparent 0%,
+        color-mix(in srgb, var(--color-primary) 65%, transparent) 12%,
+        transparent 32%,
+        transparent 62%,
+        color-mix(in srgb, var(--color-primary) 40%, transparent) 75%,
+        transparent 92%);
+    filter: blur(11px);
+    opacity: 0.45;
+    animation: card-halo 12s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes card-halo { to { transform: rotate(360deg); } }
+
+.card-stack:hover { box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px color-mix(in srgb, var(--color-primary) 22%, transparent), var(--glass-highlight); }
+
+/* Profile banner (Premium) */
+.card-banner {
+    margin: -32px -28px 2px;
+    border-radius: 23px 23px 0 0;
+    overflow: hidden;
+    border-bottom: 1px solid var(--glass-border);
+}
+.card-banner[hidden] { display: none; }
+.card-banner img { width: 100%; height: 104px; object-fit: cover; display: block; }
+
+/* ============================================================
+   Animations
+   ============================================================ */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.6; }
+}
+
+.fade-in {
+    animation: fadeIn 0.7s var(--ease-out-soft) both;
+}
+
+/* ============================================================
+   Profile
+   ============================================================ */
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+}
+
+.profile-info {
+    text-align: center;
+    max-width: none;
+}
+
+.profile-name {
+    margin: 0 0 0.3rem 0;
+    font-weight: 600;
+    font-size: 1.4rem;
+    letter-spacing: 0.01em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.profile-description {
+    margin: 0;
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.03em;
+}
+
+.profile-description.typing::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    background: var(--color-primary);
+    animation: caret-blink 1s step-end infinite;
+}
+
+@keyframes caret-blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0; }
+}
+
+/* Profile tags / chips */
+.profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 0.6rem;
+}
+
+.profile-tag {
+    font-size: 0.62rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    padding: 3px 10px;
+    border-radius: 99px;
+    color: var(--color-text-secondary);
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    transition: color var(--transition-base), border-color var(--transition-base);
+}
+
+.profile-tag:hover {
+    color: var(--color-text);
+    border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+}
+
+.profile-image-wrapper {
+    position: relative;
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    overflow: visible;
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 12%, transparent),
+                0 0 34px color-mix(in srgb, var(--color-primary) 45%, transparent);
+    transition: transform var(--transition-base) var(--ease-out-soft), box-shadow var(--transition-base);
+    flex-shrink: 0;
+}
+
+.profile-image-wrapper:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 20%, transparent),
+                0 0 42px color-mix(in srgb, var(--color-primary) 60%, transparent);
+}
+
+/* Discord avatar decoration */
+.profile-decoration {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 124px;
+    height: 124px;
+    transform: translate(-50%, -50%);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    z-index: 2;
+    animation: profile-decoration-glow 4s ease-in-out infinite;
+}
+
+@keyframes profile-decoration-glow {
+    0%, 100% { filter: brightness(1) saturate(1); }
+    50%      { filter: brightness(1.1) saturate(1.1); }
+}
+
+.profile-image-wrapper.has-decoration { border-width: 3px; }
+.profile-image-wrapper.has-decoration:hover { transform: scale(1.03); }
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: filter var(--transition-base);
+}
+
+.profile-image[src=""],
+.profile-image:not([src]) {
+    background: linear-gradient(135deg, #2a2a2a, #444);
+}
+
+.profile-image.loading { opacity: 0.6; filter: blur(2px); }
+.profile-image.loaded  { opacity: 1; filter: none; }
+.profile-image.error   { opacity: 0.5; filter: grayscale(100%); }
+
+.profile-image-gif { image-rendering: auto; }
+
+.profile-image-wrapper:hover .profile-image { filter: brightness(1.1); }
+
+/* ============================================================
+   Dividers
+   ============================================================ */
+.divider {
+    width: 40px;
+    height: 2px;
+    margin: 0 auto;
+    background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+    border-radius: 2px;
+}
+
+.divider-thin {
+    width: 100%;
+    height: 1px;
+    margin: 0.75rem 0;
+    background-color: var(--color-border);
+}
+
+/* ============================================================
+   Social Icons
+   ============================================================ */
+.social-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+    gap: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+    justify-items: center;
+    justify-content: center;
+}
+
+.social-grid.icons-1 { grid-template-columns: repeat(1, 1fr); max-width: 60px; }
+.social-grid.icons-2 { grid-template-columns: repeat(2, 1fr); max-width: 140px; }
+.social-grid.icons-3 { grid-template-columns: repeat(3, 1fr); max-width: 200px; }
+.social-grid.icons-4 { grid-template-columns: repeat(4, 1fr); max-width: 280px; }
+.social-grid.icons-5 { grid-template-columns: repeat(5, 1fr); max-width: 350px; }
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: var(--color-text);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: transform var(--transition-base) var(--ease-out-soft),
+                background var(--transition-base),
+                color var(--transition-base),
+                box-shadow var(--transition-base);
+}
+
+.social-icon {
+    position: relative;
+}
+
+.social-icon:hover {
+    background: var(--color-primary);
+    color: var(--color-background);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+/* Tooltip from aria-label */
+.social-icon::after {
+    content: attr(aria-label);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    padding: 4px 9px;
+    border-radius: 6px;
+    background: rgba(15, 15, 18, 0.92);
+    border: 1px solid var(--glass-border);
+    color: var(--color-text);
+    font-size: 0.62rem;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+.social-icon:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+@media (hover: none) {
+    .social-icon::after { display: none; }
+}
+
+@media (max-width: 480px) {
+    .social-grid {
+        grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+        gap: 0.6rem;
+        max-width: 300px;
+        padding: 0 1rem;
+    }
+    .social-grid.icons-4,
+    .social-grid.icons-5 {
+        grid-template-columns: repeat(5, 1fr);
+        max-width: 300px;
+    }
+}
+
+/* ============================================================
+   Status Panel
+   ============================================================ */
+.status-panel {
+    padding: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    text-align: left;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-title {
+    color: var(--color-text-secondary);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-text { font-size: 0.72rem; transition: color var(--transition-base); }
+.status-text.status-online  { color: #4ade80; }
+.status-text.status-idle    { color: #facc15; }
+.status-text.status-dnd     { color: #f87171; }
+.status-text.status-offline { color: var(--color-text-secondary); }
+
+/* Status dots */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-dot);
+    flex-shrink: 0;
+}
+
+.status-dot.active { background-color: var(--status-online); box-shadow: 0 0 8px var(--status-online); animation: pulse 2s infinite; }
+.status-dot.idle   { background-color: var(--status-idle);   box-shadow: 0 0 8px var(--status-idle);   animation: pulse 2s infinite; }
+.status-dot.dnd    { background-color: var(--status-dnd);    box-shadow: 0 0 8px var(--status-dnd);    animation: pulse 2s infinite; }
+.status-dot.offline{ background-color: var(--status-offline);box-shadow: none; animation: none; }
+
+.status-info { margin-top: 0.25rem; }
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 0.78rem;
+    padding: 0.4rem 0;
+}
+
+.status-label { color: var(--color-text-secondary); }
+.status-value { color: var(--color-text); text-align: right; }
+
+.time-value {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+}
+
+.tz-diff {
+    color: var(--color-text-muted);
+    font-size: 0.62rem;
+    letter-spacing: 0.02em;
+    margin-top: 1px;
+}
+
+/* ============================================================
+   Discord Rich Presence (inside status panel)
+   ============================================================ */
+.discord-activity {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 0.85rem;
+    padding: 0.7rem;
+    border-radius: 12px;
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+}
+
+.discord-activity[hidden] { display: none; }
+
+.activity-art-wrap {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.activity-art {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+.activity-art.show { display: block; }
+.activity-art-fallback { color: var(--color-text-muted); font-size: 1.1rem; }
+.activity-art.show + .activity-art-fallback { display: none; }
+
+.activity-meta {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.activity-kind {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    margin-bottom: 1px;
+}
+
+.activity-line1 {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.activity-line2 {
+    font-size: 0.68rem;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.activity-progress {
+    height: 3px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.activity-progress[hidden] { display: none; }
+
+.activity-progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #1db954, #1ed760);
+    transition: width 1s linear;
+}
+
+/* ============================================================
+   Corner Widgets (Last.fm + Music Player)
+   ============================================================ */
+.corner-widget {
+    position: fixed;
+    z-index: 50;
+    display: none;
+}
+
+.corner-tl { top: 1.5rem; left: 1.5rem; }
+.corner-bl { bottom: 1.5rem; left: 1.5rem; }
+
+@media (min-width: 1024px) {
+    .corner-widget { display: block; }
+}
+
+.widget-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+}
+
+.widget-title {
+    font-size: 0.66rem;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Last.fm widget */
+.lastfm-widget {
+    width: 250px;
+    padding: 0.85rem;
+    transition: transform var(--transition-base) var(--ease-out-soft), box-shadow var(--transition-base);
+}
+
+.lastfm-widget:hover,
+.music-player-widget:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), var(--glass-highlight);
+}
+
+.lastfm-body {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.album-art-wrap {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.album-art {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+.album-art.show { display: block; }
+.album-art-fallback { color: var(--color-text-muted); font-size: 1rem; }
+.album-art.show + .album-art-fallback { display: none; }
+
+.lastfm-meta { flex: 1; min-width: 0; }
+
+.track-name {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 0.3s ease;
+}
+
+.artist-name {
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 0.3s ease;
+}
+
+/* Equalizer (now-playing indicator) */
+.eq {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 11px;
+    flex-shrink: 0;
+}
+
+.eq i {
+    width: 2.5px;
+    height: 100%;
+    background: var(--status-offline);
+    border-radius: 1px;
+    transform-origin: bottom;
+    transform: scaleY(0.3);
+}
+
+.eq.playing i {
+    background: var(--color-primary);
+    animation: eq-bounce 0.9s ease-in-out infinite;
+}
+
+.eq.playing i:nth-child(2) { animation-delay: 0.2s; }
+.eq.playing i:nth-child(3) { animation-delay: 0.4s; }
+.eq.playing i:nth-child(4) { animation-delay: 0.1s; }
+
+@keyframes eq-bounce {
+    0%, 100% { transform: scaleY(0.3); }
+    50%      { transform: scaleY(1); }
+}
+
+/* Music Player widget */
+.music-player-widget {
+    width: 250px;
+    padding: 0.85rem;
+    transition: transform var(--transition-base) var(--ease-out-soft), box-shadow var(--transition-base);
+}
+
+.toggle-play {
+    margin-left: auto;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg-strong);
+    color: var(--color-text);
+    cursor: pointer;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-base), transform var(--transition-fast);
+}
+
+.toggle-play:hover { background: var(--color-primary); color: var(--color-background); }
+.toggle-play:active { transform: scale(0.92); }
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.volume-slider {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--color-border);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+    border: 2px solid var(--color-background);
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+    border: 2px solid var(--color-background);
+}
+
+.volume-icon {
+    color: var(--color-text-secondary);
+    font-size: 0.72rem;
+    width: 16px;
+    text-align: center;
+}
+
+/* ============================================================
+   Discord Badges
+   ============================================================ */
+.discord-badges {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+    flex-wrap: wrap;
+    vertical-align: middle;
+}
+
+.discord-badge {
+    width: 22px;
+    height: 22px;
+    display: inline-block;
+    transition: transform 0.2s ease, filter 0.2s ease;
+    background: transparent;
+    border: none;
+}
+
+.discord-badge:hover { filter: brightness(1.3) saturate(1.2); transform: scale(1.15); }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+footer {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.footer-text {
+    color: var(--color-text-muted);
+    font-size: 0.72rem;
+    font-weight: 300;
+}
+
+.view-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 0.66rem;
+    letter-spacing: 0.03em;
+    color: var(--color-text-secondary);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    font-variant-numeric: tabular-nums;
+}
+
+.view-counter i { font-size: 0.62rem; opacity: 0.8; }
+.view-counter[hidden] { display: none; }
+
+/* ============================================================
+   Mobile
+   ============================================================ */
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .profile-info { text-align: center; max-width: none; }
+    .profile-name { justify-content: center; }
+    .profile-tags { justify-content: center; }
+    .profile-image-wrapper { width: 96px; height: 96px; }
+
+    .profile-decoration {
+        width: 114px;
+        height: 114px;
+    }
+
+    .profile-name { font-size: 1.25rem; }
+    .profile-description { font-size: 0.875rem; }
+
+    .discord-badges { gap: 4px; margin-left: 6px; }
+    .discord-badge { width: 20px; height: 20px; }
+}
+
+/* ============================================================
+   Performance + Accessibility
+   ============================================================ */
+.profile-image-wrapper,
+.lastfm-widget,
+.music-player-widget,
+.status-panel {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* (Global reduced-motion override removed — the bio is animation-forward and the
+   embedded preview forces reduced-motion, which was suppressing all the motion.) */
+
+/* ============================================================
+   Now Playing dock
+   ============================================================ */
+.np-dock {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%) translateY(170%);
+    width: min(560px, calc(100vw - 32px));
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow), var(--glass-highlight);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    z-index: 60;
+    opacity: 0;
+    transition: transform 0.75s var(--ease-out-soft), opacity 0.5s ease;
+}
+.np-dock.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.np-wave { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+.np-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+}
+
+.np-art {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 11px;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 1px var(--glass-border), 0 0 18px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+.np-art img { width: 100%; height: 100%; object-fit: cover; display: none; }
+.np-art-fallback { color: var(--color-text-muted); font-size: 1.1rem; }
+
+.np-meta { flex: 1; min-width: 0; text-align: left; }
+.np-title { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.np-artist { font-size: 0.74rem; color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.np-progress { margin-top: 7px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.14); cursor: pointer; overflow: hidden; }
+.np-progress-bar { height: 100%; width: 0%; border-radius: 4px; background: var(--color-primary); }
+
+.np-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.np-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg-strong);
+    color: var(--color-text);
+    cursor: pointer;
+    display: grid; place-items: center;
+    font-size: 0.78rem;
+    transition: background 0.2s, color 0.2s, transform 0.12s;
+}
+.np-btn:hover { background: var(--color-primary); color: var(--color-background); }
+.np-btn:active { transform: scale(0.9); }
+.np-play { width: 40px; height: 40px; font-size: 0.92rem; background: var(--color-primary); color: var(--color-background); box-shadow: 0 0 16px color-mix(in srgb, var(--color-primary) 45%, transparent); }
+.np-play:hover { filter: brightness(1.12); }
+
+.np-vol { width: 70px; height: 4px; -webkit-appearance: none; appearance: none; background: rgba(255, 255, 255, 0.16); border-radius: 4px; outline: none; cursor: pointer; margin-left: 4px; }
+.np-vol::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--color-primary); cursor: pointer; }
+.np-vol::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--color-primary); border: none; cursor: pointer; }
+
+/* ============================================================
+   Custom links (Premium) + branding credit
+   ============================================================ */
+.custom-links { display: flex; flex-direction: column; gap: 8px; }
+.custom-links:empty { display: none; }
+.custom-link {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 11px 16px;
+    border-radius: 12px;
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 500;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    transition: transform var(--transition-base) var(--ease-out-soft), background var(--transition-base), color var(--transition-base), box-shadow var(--transition-base);
+}
+.custom-link:hover {
+    transform: translateY(-2px);
+    background: var(--color-primary);
+    color: var(--color-background);
+    box-shadow: 0 8px 22px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.lumen-credit {
+    position: fixed;
+    bottom: 14px;
+    right: 14px;
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 0.66rem;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transition: color 0.2s, transform 0.2s;
+}
+.lumen-credit:hover { color: var(--color-text); transform: translateY(-2px); }
+.lumen-credit[hidden] { display: none; }
+
+/* Lift the footer above the dock when it's present */
+body.has-np footer { bottom: 96px; transition: bottom 0.6s var(--ease-out-soft); }
+
+@media (max-width: 560px) {
+    .np-vol { display: none; }
+    .np-dock { bottom: 12px; }
+    .np-inner { gap: 11px; padding: 11px 13px; }
+}

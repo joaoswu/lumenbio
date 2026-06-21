@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Admin · Lumenbio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/shared/lumen.css?v=1.1.20">
+  <link rel="stylesheet" href="/dashboard/dashboard.css?v=1.1.20">
+</head>
+<body>
+  <div class="lumen-bg"></div>
+
+  <nav class="nav-island">
+    <a class="nav-brand" href="/"><span class="logo"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></span><span class="brand-text">Lumenbio</span></a>
+    <div class="nav-tabs">
+      <span class="nav-indicator"></span>
+      <a class="nav-tab" data-path="/" href="/"><i class="fas fa-house"></i><span class="tab-text">Home</span></a>
+      <a class="nav-tab" data-path="/dashboard" href="/dashboard"><i class="fas fa-gauge-high"></i><span class="tab-text">Dashboard</span></a>
+      <a class="nav-tab" data-path="/admin" href="/admin"><i class="fas fa-shield-halved"></i><span class="tab-text">Admin</span></a>
+    </div>
+    <a class="nav-cta" href="#" id="logout-btn"><i class="fas fa-arrow-right-from-bracket"></i> Log out</a>
+  </nav>
+
+  <main class="dash">
+    <div class="dash-head">
+      <div class="dash-hello">
+        <h1>Admin <i class="fas fa-shield-halved" style="color:var(--accent)"></i></h1>
+        <p>Manage members and premium codes</p>
+      </div>
+      <div class="dash-actions">
+        <a class="btn btn-ghost" href="/dashboard"><i class="fas fa-arrow-left"></i> Back to dashboard</a>
+      </div>
+    </div>
+
+    <div class="admin-grid">
+      <section class="tab-panel" style="display:block">
+        <h2><i class="fas fa-users"></i> Members <span class="admin-count" id="user-count"></span></h2>
+        <div class="admin-bar">
+          <input type="text" class="admin-search" id="user-search" placeholder="Search username or email…">
+          <button class="btn btn-ghost btn-sm" id="toggle-emails"><i class="fas fa-eye"></i> Show emails</button>
+        </div>
+        <div class="admin-table-wrap emails-hidden" id="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>User</th><th>Email</th><th>Plan</th><th>Views</th><th></th></tr></thead>
+            <tbody id="users-body"><tr><td colspan="5" class="admin-empty">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="tab-panel" style="display:block">
+        <h2><i class="fas fa-ticket"></i> Premium codes</h2>
+        <div class="codes-head">
+          <input type="number" id="gen-count" value="5" min="1" max="50" class="gen-count">
+          <button class="btn btn-primary" id="gen-btn"><i class="fas fa-plus"></i> Generate</button>
+        </div>
+        <ul class="code-list" id="code-list"></ul>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/shared/nav.js?v=1.1.20"></script>
+  <script src="/admin/admin.js?v=1.1.20"></script>
+</body>
+</html>

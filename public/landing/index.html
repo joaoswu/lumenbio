@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Lumenbio — your bio page, reimagined</title>
+  <meta name="description" content="Build a stunning, animated bio page with Discord presence, Last.fm, music, particles and full theming. Free while in early access.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/shared/lumen.css?v=1.1.20">
+  <link rel="stylesheet" href="/landing/landing.css?v=1.1.20">
+</head>
+<body>
+  <div class="lumen-bg"></div>
+  <div class="lumen-grid"></div>
+
+  <!-- Dynamic island navbar -->
+  <nav class="nav-island">
+    <a class="nav-brand" href="/"><span class="logo"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></span><span class="brand-text">Lumenbio</span></a>
+    <div class="nav-tabs">
+      <span class="nav-indicator"></span>
+      <a class="nav-tab" data-path="/" href="/"><i class="fas fa-house"></i><span class="tab-text">Home</span></a>
+      <a class="nav-tab" data-path="/dashboard" href="/dashboard"><i class="fas fa-gauge-high"></i><span class="tab-text">Dashboard</span></a>
+      <a class="nav-tab" href="https://discord.gg/zZ9umH8Jja" target="_blank" rel="noopener"><i class="fab fa-discord"></i><span class="tab-text">Discord</span></a>
+    </div>
+    <a class="nav-cta" data-auth-cta href="/signup"><i class="fas fa-arrow-right-to-bracket"></i> Get Started</a>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-copy">
+      <div class="pill"><span class="pill-dot"></span> Early access · <span id="spots">1000</span> spots left</div>
+      <h1>Your bio page,<br><span class="grad">reimagined.</span></h1>
+      <p class="lead">One link for everything you are. Live Discord presence, Last.fm now-playing, a music player, particles, glow and full theming — wrapped in glassmorphism and buttery animations.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg" href="/signup"><i class="fas fa-wand-magic-sparkles"></i> Create your page</a>
+        <a class="btn btn-ghost btn-lg" href="#features"><i class="fas fa-arrow-down"></i> Explore features</a>
+      </div>
+    </div>
+
+    <!-- Floating mock bio card -->
+    <div class="hero-visual" data-reveal>
+      <div class="mock glass">
+        <div class="mock-glow"></div>
+        <div class="mock-avatar"><i class="fas fa-user-astronaut"></i></div>
+        <div class="mock-name">nova <i class="fas fa-circle-check" style="color:var(--accent-2);font-size:.7em"></i></div>
+        <div class="mock-role">Designer ● Dreamer</div>
+        <div class="mock-tags"><span>Creative</span><span>Music</span><span>VR</span></div>
+        <div class="mock-socials">
+          <span><i class="fab fa-github"></i></span>
+          <span><i class="fab fa-discord"></i></span>
+          <span><i class="fab fa-spotify"></i></span>
+          <span><i class="fab fa-steam"></i></span>
+          <span><i class="fab fa-youtube"></i></span>
+        </div>
+        <div class="mock-status">
+          <div class="mock-row"><span>Status</span><span class="mock-on"><span class="dot"></span> Online</span></div>
+          <div class="mock-row"><span>Now playing</span><span class="eq3"><i></i><i></i><i></i></span></div>
+        </div>
+      </div>
+      <div class="mock-chip mock-chip-1 glass"><i class="fab fa-spotify"></i> Strobe — deadmau5</div>
+      <div class="mock-chip mock-chip-2 glass"><i class="fas fa-eye"></i> 12,480 views</div>
+    </div>
+  </header>
+
+  <!-- Marquee strip -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span><i class="fab fa-discord"></i> Discord presence</span>
+      <span><i class="fab fa-lastfm"></i> Last.fm</span>
+      <span><i class="fas fa-palette"></i> Accent themes</span>
+      <span><i class="fas fa-wand-sparkles"></i> Particles</span>
+      <span><i class="fas fa-music"></i> Music player</span>
+      <span><i class="fas fa-clock"></i> Live clock</span>
+      <span><i class="fas fa-cube"></i> 3D tilt</span>
+      <span><i class="fas fa-bolt"></i> Bloom glow</span>
+      <!-- duplicate for seamless loop -->
+      <span><i class="fab fa-discord"></i> Discord presence</span>
+      <span><i class="fab fa-lastfm"></i> Last.fm</span>
+      <span><i class="fas fa-palette"></i> Accent themes</span>
+      <span><i class="fas fa-wand-sparkles"></i> Particles</span>
+      <span><i class="fas fa-music"></i> Music player</span>
+      <span><i class="fas fa-clock"></i> Live clock</span>
+      <span><i class="fas fa-cube"></i> 3D tilt</span>
+      <span><i class="fas fa-bolt"></i> Bloom glow</span>
+    </div>
+  </div>
+
+  <!-- Stats band -->
+  <section class="stats">
+    <div class="stat glass" data-reveal style="--i:0"><div class="stat-num" data-count="15" data-suffix="+">0</div><div class="stat-label">customizations</div></div>
+    <div class="stat glass" data-reveal style="--i:1"><div class="stat-num">100%</div><div class="stat-label">free in beta</div></div>
+    <div class="stat glass" data-reveal style="--i:2"><div class="stat-num" data-count="10">0</div><div class="stat-label">social platforms</div></div>
+    <div class="stat glass" data-reveal style="--i:3"><div class="stat-num">0</div><div class="stat-label">lines of code</div></div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="section-head" data-reveal>
+      <div class="eyebrow">Customize everything</div>
+      <h2>Make it unmistakably <span class="grad">yours.</span></h2>
+      <p>Every detail is tunable from your dashboard — no code required.</p>
+    </div>
+
+    <div class="feature-grid">
+      <article class="feature glass" data-reveal style="--i:0">
+        <div class="feature-icon" style="--c:#c4313a"><i class="fab fa-discord"></i></div>
+        <h3>Discord presence</h3>
+        <p>Live status, what you're playing, and Spotify with album art &amp; a real-time progress bar — powered by Lanyard.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:1">
+        <div class="feature-icon" style="--c:#a4161a"><i class="fab fa-lastfm"></i></div>
+        <h3>Last.fm now playing</h3>
+        <p>Show the track you're listening to with album artwork and an animated equalizer.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:2">
+        <div class="feature-icon" style="--c:#b5402f"><i class="fas fa-palette"></i></div>
+        <h3>Accent theming</h3>
+        <p>Pick any accent color and watch glows, borders, particles and hovers retint instantly.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:3">
+        <div class="feature-icon" style="--c:#9b1d2b"><i class="fas fa-wand-magic-sparkles"></i></div>
+        <h3>Particles</h3>
+        <p>Floating particle field with adjustable count, speed, color and connecting lines.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:4">
+        <div class="feature-icon" style="--c:#c0392b"><i class="fas fa-bolt"></i></div>
+        <h3>Bloom &amp; glow</h3>
+        <p>Soft neon bloom on text, icons and your avatar — tune strength, radius and pulse.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:5">
+        <div class="feature-icon" style="--c:#8e1d2a"><i class="fas fa-music"></i></div>
+        <h3>Music player</h3>
+        <p>Upload your own tracks with a glass mini-player, volume control and optional autoplay.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:6">
+        <div class="feature-icon" style="--c:#93303a"><i class="fas fa-clock"></i></div>
+        <h3>Live timezone clock</h3>
+        <p>Your local time, plus how many hours ahead or behind each visitor is from you.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:7">
+        <div class="feature-icon" style="--c:#7a1420"><i class="fas fa-cube"></i></div>
+        <h3>3D tilt</h3>
+        <p>The card gently tilts toward the cursor for a tactile, depthful feel.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:8">
+        <div class="feature-icon" style="--c:#b23a48"><i class="fas fa-keyboard"></i></div>
+        <h3>Typewriter &amp; tags</h3>
+        <p>Type out your bio letter-by-letter and add chips that describe you at a glance.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:9">
+        <div class="feature-icon" style="--c:#88222b"><i class="fas fa-hand-sparkles"></i></div>
+        <h3>Welcome screen</h3>
+        <p>An optional glass splash visitors tap to enter, with your custom greeting.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:10">
+        <div class="feature-icon" style="--c:#a52a2a"><i class="fas fa-image"></i></div>
+        <h3>Backgrounds &amp; fonts</h3>
+        <p>Image or video backgrounds with blur &amp; opacity, plus six handpicked fonts.</p>
+      </article>
+      <article class="feature glass" data-reveal style="--i:11">
+        <div class="feature-icon" style="--c:#6f1119"><i class="fas fa-share-nodes"></i></div>
+        <h3>10 social links</h3>
+        <p>GitHub, X, Steam, VRChat, osu!, Instagram, TikTok, YouTube, NameMC &amp; Last.fm.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Steps -->
+  <section class="steps-section">
+    <div class="section-head" data-reveal>
+      <div class="eyebrow">Three steps</div>
+      <h2>Live in under a minute.</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step glass" data-reveal style="--i:0"><div class="step-n">1</div><h3>Sign up</h3><p>Claim your username — it becomes <span class="mono">lumenbio/u/you</span>.</p></div>
+      <div class="step glass" data-reveal style="--i:1"><div class="step-n">2</div><h3>Customize</h3><p>Tune colors, effects and integrations live from your dashboard.</p></div>
+      <div class="step glass" data-reveal style="--i:2"><div class="step-n">3</div><h3>Share</h3><p>Drop your one link anywhere and watch the views roll in.</p></div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <div class="section-head" data-reveal>
+      <div class="eyebrow">Pricing</div>
+      <h2>Start free, go <span class="grad">Premium.</span></h2>
+      <p>Everything you need to launch is free. Upgrade when you want more.</p>
+    </div>
+    <div class="price-grid">
+      <div class="price-card glass" data-reveal style="--i:0">
+        <div class="price-name">Free</div>
+        <div class="price-amt">$0<span>/forever</span></div>
+        <a class="btn btn-ghost price-cta" href="/signup">Create your page</a>
+        <ul class="price-list">
+          <li><i class="fas fa-check"></i> Your page at <span class="mono">lumenbio/u/you</span></li>
+          <li><i class="fas fa-check"></i> Discord presence &amp; Last.fm</li>
+          <li><i class="fas fa-check"></i> Music player + waveform dock</li>
+          <li><i class="fas fa-check"></i> Particles, bloom &amp; 3D tilt</li>
+          <li><i class="fas fa-check"></i> Accent color, fonts &amp; tags</li>
+          <li><i class="fas fa-check"></i> Live clock &amp; visit counter</li>
+          <li><i class="fas fa-check"></i> 10 social links</li>
+          <li class="muted"><i class="fas fa-xmark"></i> Lumenbio badge on your page</li>
+        </ul>
+      </div>
+      <div class="price-card glass featured" data-reveal style="--i:1">
+        <div class="price-badge"><i class="fas fa-crown"></i> Most popular</div>
+        <div class="price-name">Premium</div>
+        <div class="price-amt" id="price-amt">$5<span>/one-time</span></div>
+        <a class="btn btn-primary price-cta" href="/signup"><i class="fas fa-crown"></i> Go Premium</a>
+        <ul class="price-list">
+          <li class="hl"><i class="fas fa-check"></i> Everything in Free, plus:</li>
+          <li><i class="fas fa-check"></i> Custom link buttons</li>
+          <li><i class="fas fa-check"></i> Remove Lumenbio branding</li>
+          <li><i class="fas fa-check"></i> Custom CSS</li>
+          <li><i class="fas fa-check"></i> Profile banner &amp; video background</li>
+          <li><i class="fas fa-check"></i> Custom cursor</li>
+          <li><i class="fas fa-check"></i> Password-protect your page</li>
+          <li><i class="fas fa-check"></i> Advanced analytics</li>
+          <li><i class="fas fa-check"></i> Custom domain</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="section-head" data-reveal>
+      <div class="eyebrow">Good to know</div>
+      <h2>Questions, <span class="grad">answered.</span></h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item glass" data-reveal style="--i:0">
+        <summary>Is Lumenbio free?<i class="fas fa-chevron-down"></i></summary>
+        <div class="faq-a">Completely free during early access. We're capping it at 1,000 pages for now so everyone gets a fast, polished experience.</div>
+      </details>
+      <details class="faq-item glass" data-reveal style="--i:1">
+        <summary>Do I need to know how to code?<i class="fas fa-chevron-down"></i></summary>
+        <div class="faq-a">Not at all. Everything is point-and-click from your dashboard, with a live preview that updates as you tweak.</div>
+      </details>
+      <details class="faq-item glass" data-reveal style="--i:2">
+        <summary>What can I put on my page?<i class="fas fa-chevron-down"></i></summary>
+        <div class="faq-a">Live Discord presence, Last.fm now-playing, a music player, up to 10 social links, rotating locations, profile tags, a live clock and more — all themeable.</div>
+      </details>
+      <details class="faq-item glass" data-reveal style="--i:3">
+        <summary>Can I change it later?<i class="fas fa-chevron-down"></i></summary>
+        <div class="faq-a">Anytime. Adjust colors, effects, integrations and links from your dashboard whenever you like — changes go live instantly.</div>
+      </details>
+      <details class="faq-item glass" data-reveal style="--i:4">
+        <summary>What will my link look like?<i class="fas fa-chevron-down"></i></summary>
+        <div class="faq-a">Clean and shareable: <span class="mono">lumenbio/u/yourname</span> — one link for everything you are.</div>
+      </details>
+      <details class="faq-item glass" data-reveal style="--i:5">
+        <summary>Is my account secure?<i class="fas fa-chevron-down"></i></summary>
+        <div class="faq-a">Yes. Passwords are hashed with bcrypt and never stored in plain text, and your session is kept in a secure, http-only cookie.</div>
+      </details>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-card glass" data-reveal>
+      <h2>Claim your <span class="grad">Lumenbio</span>.</h2>
+      <p>Free during early access. Claim your username in under a minute.</p>
+      <a class="btn btn-primary btn-lg" href="/signup"><i class="fas fa-wand-magic-sparkles"></i> Create your page</a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="foot-brand">
+      <span class="nav-brand"><span class="logo"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></span> Lumenbio</span>
+      <p class="foot-tag">One link for everything you are.</p>
+    </div>
+    <div class="foot-cols">
+      <div class="foot-col">
+        <span class="foot-h">Product</span>
+        <a href="/signup">Get started</a>
+        <a href="#features">Features</a>
+        <a href="/login">Log in</a>
+      </div>
+      <div class="foot-col">
+        <span class="foot-h">Community</span>
+        <a href="https://discord.gg/zZ9umH8Jja" target="_blank" rel="noopener">Discord</a>
+      </div>
+    </div>
+  </footer>
+  <div class="foot-base">© 2025 Lumenbio · made with ❤️ during early access</div>
+
+  <script src="/shared/nav.js?v=1.1.20"></script>
+  <script src="/landing/landing.js?v=1.1.20"></script>
+</body>
+</html>

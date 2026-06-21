@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Log in · Lumenbio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/shared/lumen.css?v=1.1.20">
+  <link rel="stylesheet" href="/auth/auth.css?v=1.1.20">
+</head>
+<body>
+  <div class="lumen-bg"></div>
+  <div class="lumen-grid"></div>
+
+  <div class="auth-wrap">
+    <a class="auth-brand" href="/"><span class="logo"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></span> Lumenbio</a>
+
+    <div class="auth-card glass">
+      <h1>Welcome back</h1>
+      <p class="auth-sub">Log in to manage your page.</p>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="identifier">Username or email</label>
+          <div class="input-wrap">
+            <i class="fas fa-user"></i>
+            <input type="text" id="identifier" name="identifier" placeholder="you or you@email.com" autocomplete="username" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+            <button type="button" class="toggle-pass" data-target="password" aria-label="Show password"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary auth-submit" id="submit-btn">
+          <i class="fas fa-arrow-right-to-bracket"></i> Log in
+        </button>
+        <div class="auth-error" id="auth-error" hidden></div>
+      </form>
+
+      <p class="auth-alt">New here? <a href="/signup">Create your page →</a></p>
+    </div>
+  </div>
+
+  <script src="/auth/auth.js?v=1.1.20"></script>
+</body>
+</html>

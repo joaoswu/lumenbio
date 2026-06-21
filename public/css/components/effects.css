@@ -1,0 +1,95 @@
+/* ============================================================
+   Visual Effects — Bloom, Particles, Background
+   ============================================================ */
+:root {
+    --bloom-strength: 1.3;
+    --bloom-radius: 15px;
+    --bloom-text-shadow: var(--color-primary);
+    --bloom-animation: subtle-pulse 4s infinite alternate;
+    --bloom-color: var(--color-primary);
+}
+
+/* ---------- Bloom ---------- */
+.bloom {
+    filter: brightness(var(--bloom-strength)) drop-shadow(0 0 var(--bloom-radius) var(--bloom-color));
+    transition: filter 0.3s ease;
+}
+
+.bloom-image {
+    filter: drop-shadow(0 0 var(--bloom-radius) var(--bloom-color));
+    transition: filter 0.3s ease;
+}
+
+.bloom-dot {
+    filter: drop-shadow(0 0 calc(var(--bloom-radius) * 0.8) var(--color-dot));
+    transition: filter 0.3s ease;
+}
+
+.bloom-text {
+    text-shadow:
+        0 0 10px var(--bloom-text-shadow),
+        0 0 20px var(--bloom-text-shadow),
+        0 0 30px var(--bloom-text-shadow);
+    color: #ffffff;
+    animation: var(--bloom-animation);
+    transition: text-shadow 0.3s ease;
+}
+
+.bloom-icon {
+    filter: drop-shadow(0 0 calc(var(--bloom-radius) * 0.6) var(--bloom-color));
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.bloom-icon:hover {
+    filter: drop-shadow(0 0 calc(var(--bloom-radius) * 1.2) var(--bloom-color));
+    transform: scale(1.05);
+}
+
+@keyframes subtle-pulse {
+    0%   { text-shadow: 0 0 10px var(--color-primary), 0 0 15px var(--color-primary); }
+    100% { text-shadow: 0 0 15px var(--color-primary), 0 0 30px var(--color-primary), 0 0 45px var(--color-primary); }
+}
+
+.social-icon.bloom-icon:hover {
+    transform: translateY(-6px) scale(1.08);
+    box-shadow: 0 0 calc(var(--bloom-radius) * 1.3) var(--bloom-color);
+}
+
+/* ---------- Particles ---------- */
+#particles-js {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ---------- Background Layers ---------- */
+#bg-video,
+#bg-image,
+#bg-fallback {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    pointer-events: none;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+#bg-video { object-fit: cover; }
+
+#bg-image,
+#bg-fallback {
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+#bg-fallback { z-index: -3; }
+
+/* ---------- Rotating Location ---------- */
+.location-text {
+    display: inline-block;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}

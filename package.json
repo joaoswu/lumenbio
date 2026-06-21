@@ -1,0 +1,43 @@
+{
+  "name": "meow-bio",
+  "version": "1.1.5",
+  "description": "Modular personal bio page with Discord integration, Last.fm, music player, and dynamic backgrounds",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "config": "node scripts/generateConfig.js",
+    "serve": "npx live-server public --port=3000 --open=/index.html",
+    "release": "node scripts/release.js"
+  },
+  "keywords": [
+    "bio-page",
+    "personal-website",
+    "lastfm-integration",
+    "music-bio",
+    "video-background",
+    "particle-effects",
+    "responsive-design",
+    "developer-portfolio",
+    "customizable-template",
+    "real-time-music",
+    "social-media-links",
+    "personal-branding"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.1.1",
+    "particles.js": "^2.0.0",
+    "stripe": "^22.2.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
