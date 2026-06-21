@@ -25,7 +25,7 @@
         .then(r => r.json())
         .then(d => {
           if (d.user) {
-            cta.innerHTML = '<i class="fas fa-gauge-high"></i> Dashboard';
+            cta.innerHTML = '<i class="fas fa-sliders"></i> Dashboard';
             cta.setAttribute('href', '/dashboard');
           }
         })
