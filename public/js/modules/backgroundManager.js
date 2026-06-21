@@ -40,10 +40,10 @@ class BackgroundManager {
         
         Object.assign(this.videoElement.style, {
             position: 'fixed',
-            top: '0',
-            left: '0',
-            width: '100vw',
-            height: '100vh',
+            top: '-10px',
+            left: '-10px',
+            right: '-10px',
+            bottom: '-10px',
             objectFit: 'cover',
             zIndex: '-2',
             pointerEvents: 'none',
@@ -83,10 +83,10 @@ class BackgroundManager {
         
         Object.assign(imageElement.style, {
             position: 'fixed',
-            top: '0',
-            left: '0',
-            width: '100vw',
-            height: '100vh',
+            top: '-10px',
+            left: '-10px',
+            right: '-10px',
+            bottom: '-10px',
             backgroundImage: `url('${imageSrc}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
@@ -112,10 +112,10 @@ class BackgroundManager {
         
         Object.assign(this.fallbackElement.style, {
             position: 'fixed',
-            top: '0',
-            left: '0',
-            width: '100vw',
-            height: '100vh',
+            top: '-10px',
+            left: '-10px',
+            right: '-10px',
+            bottom: '-10px',
             backgroundImage: `url('${imageSrc}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center center',

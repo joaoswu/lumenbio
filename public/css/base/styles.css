@@ -75,7 +75,10 @@ body::-webkit-scrollbar {
 
 #background-overlay {
     position: fixed;
-    inset: 0;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
     background: radial-gradient(120% 120% at 50% 0%, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.55) 100%);
     z-index: -1;
     pointer-events: none;
@@ -84,7 +87,10 @@ body::-webkit-scrollbar {
 /* Ambient accent glow — soft drifting blobs tinted with the accent color */
 #accent-glow {
     position: fixed;
-    inset: 0;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
     z-index: -1;
     pointer-events: none;
     opacity: 0.45;
