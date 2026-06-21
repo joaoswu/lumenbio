@@ -1,5 +1,5 @@
 const { Redis } = require('@upstash/redis');
-const kv = Redis.fromEnv();
+const kv = new Redis({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN });
 const MAX_USERS = 1000;
 const ADMIN_USERS = (process.env.ADMIN_USERS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 
