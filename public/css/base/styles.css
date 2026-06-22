@@ -755,14 +755,28 @@ body::-webkit-scrollbar {
 }
 
 @media (min-width: 1025px) {
+    .inline-github {
+        display: none !important;
+    }
     .floating-github {
         position: fixed;
         bottom: 2rem;
         left: 2rem;
         width: 320px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        background: rgba(15, 15, 15, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         margin-top: 0;
-        z-index: 100;
+        z-index: 9999;
+    }
+}
+
+@media (max-width: 1024px) {
+    .floating-github {
+        display: none !important;
     }
 }
 

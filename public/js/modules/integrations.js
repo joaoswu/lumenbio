@@ -121,14 +121,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             hexColor = '8b5cf6'; 
         }
 
-        const wrap = document.createElement('div');
-        wrap.className = 'integration-card github-card floating-github';
-        wrap.innerHTML = `
+        const htmlContent = `
             <div class="github-header">
                 <i class="fab fa-github"></i> GitHub Contributions
             </div>
             <img class="github-chart" src="https://ghchart.rshah.org/${hexColor}/${config.github.username}" alt="${config.github.username}'s Github chart" />
         `;
-        grid.appendChild(wrap);
+
+        // Desktop Floating Version (appended to body to escape CSS stacking context)
+        const wrapDesktop = document.createElement('div');
+        wrapDesktop.className = 'integration-card github-card floating-github';
+        wrapDesktop.innerHTML = htmlContent;
+        document.body.appendChild(wrapDesktop);
+
+        // Mobile Inline Version (appended to normal grid)
+        const wrapMobile = document.createElement('div');
+        wrapMobile.className = 'integration-card github-card inline-github';
+        wrapMobile.innerHTML = htmlContent;
+        grid.appendChild(wrapMobile);
     }
 });
