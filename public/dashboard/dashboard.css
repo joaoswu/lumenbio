@@ -161,6 +161,11 @@ input[type=color]::-webkit-color-swatch { border: none; border-radius: 8px; }
 .reveal:hover { color: var(--text); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
 .acct-actions { margin-top: 22px; }
 
+/* Image upload row (avatar / banner) */
+.img-row { display: flex; gap: 8px; align-items: center; }
+.img-row input { flex: 1; min-width: 0; }
+.img-row .img-up { flex-shrink: 0; white-space: nowrap; }
+
 /* Email-verify banner */
 .verify-banner {
     display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;

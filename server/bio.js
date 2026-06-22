@@ -28,6 +28,15 @@ const upload = multer({
     ALLOWED_AUDIO.includes(file.mimetype) ? cb(null, true) : cb(new Error('Only audio files are allowed (mp3, wav, ogg, m4a, flac)'))
 });
 
+const ALLOWED_IMAGE = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'image/avif'];
+
+const imageUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 6 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) =>
+    ALLOWED_IMAGE.includes(file.mimetype) ? cb(null, true) : cb(new Error('Only image files are allowed (PNG, JPG, WEBP, GIF).'))
+});
+
 router.post('/songs', authRequired, upload.single('song'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
   try {
@@ -48,6 +57,22 @@ router.post('/songs', authRequired, upload.single('song'), async (req, res) => {
   } catch (e) {
     console.error('Blob upload error:', e);
     res.status(500).json({ error: 'Failed to upload song.' });
+  }
+});
+
+router.post('/image', authRequired, imageUpload.single('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+  try {
+    const kind = req.body && req.body.kind === 'banner' ? 'banner' : 'avatar';
+    const ext = path.extname(req.file.originalname || '').toLowerCase().replace(/[^.a-z0-9]/g, '') ||
+      ('.' + ((req.file.mimetype.split('/')[1] || 'png').replace('jpeg', 'jpg')));
+    const uid = (req.user && req.user.id ? req.user.id : 'u').slice(0, 8);
+    const filename = `${uid}-${kind}-${Date.now()}${ext}`;
+    const blob = await put(filename, req.file.buffer, { access: 'public', contentType: req.file.mimetype });
+    res.json({ success: true, url: blob.url });
+  } catch (e) {
+    console.error('Image upload error:', e);
+    res.status(500).json({ error: 'Failed to upload image.' });
   }
 });
 
@@ -394,6 +419,15 @@ router.get('/:username', async (req, res) => {
   const cfg = publicConfig(u.config);
   cfg.profile.badges = await getProfileBadges(u);
   res.json({ username: u.username, config: cfg, views: u.views || 0 });
+});
+
+// Surface upload errors (file too large, wrong type) as clean JSON.
+router.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError || /file|image|audio|allowed/i.test(err.message || '')) {
+    const msg = err.code === 'LIMIT_FILE_SIZE' ? 'File is too large.' : (err.message || 'Upload failed.');
+    return res.status(400).json({ error: msg });
+  }
+  next(err);
 });
 
 module.exports = { router, mergeConfig, publicConfig, getProfileBadges };

@@ -567,6 +567,45 @@
     const qrDl = document.getElementById('qr-download');
     if (qrDl) qrDl.addEventListener('click', downloadQr);
 
+    // image upload (avatar / banner) — shared hidden file input
+    let imgInput, imgCtx = null;
+    function ensureImgInput() {
+      if (imgInput) return imgInput;
+      imgInput = document.createElement('input');
+      imgInput.type = 'file';
+      imgInput.accept = 'image/png,image/jpeg,image/webp,image/gif,image/avif';
+      imgInput.style.display = 'none';
+      imgInput.addEventListener('change', async () => {
+        const file = imgInput.files && imgInput.files[0];
+        imgInput.value = '';
+        if (!file || !imgCtx) return;
+        const { btn, target } = imgCtx;
+        const urlEl = document.querySelector('[data-path="' + target + '"]');
+        const original = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading…';
+        try {
+          const fd = new FormData();
+          fd.append('image', file);
+          fd.append('kind', imgCtx.kind || 'avatar');
+          const r = await fetch('/api/bio/image', { method: 'POST', body: fd });
+          const d = await r.json();
+          if (!r.ok || !d.success) throw new Error(d.error || 'Upload failed.');
+          if (urlEl) urlEl.value = d.url;
+          setDirty(true);
+          toast('Image uploaded ✓ — Save to publish');
+        } catch (e) { toast(e.message, true); }
+        finally { btn.disabled = false; btn.innerHTML = original; }
+      });
+      document.body.appendChild(imgInput);
+      return imgInput;
+    }
+    document.querySelectorAll('.img-up').forEach(btn => {
+      btn.addEventListener('click', () => {
+        imgCtx = { btn, target: btn.dataset.target, kind: btn.dataset.kind };
+        ensureImgInput().click();
+      });
+    });
+
     // resend verification email
     const vResend = document.getElementById('verify-resend');
     if (vResend) vResend.addEventListener('click', async () => {
