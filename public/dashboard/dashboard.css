@@ -180,8 +180,9 @@ input[type=color]::-webkit-color-swatch { border: none; border-radius: 8px; }
 .acct-manage h3 { margin-top: 22px; }
 .acct-manage h3:first-child { margin-top: 0; }
 .share-box h3 i, .acct-manage h3 i { color: var(--accent); }
-.qr-wrap { display: inline-block; background: #fff; padding: 12px; border-radius: 14px; margin: 12px 0; line-height: 0; }
+.qr-wrap { display: block; width: fit-content; background: #fff; padding: 12px; border-radius: 14px; margin: 12px 0 14px; line-height: 0; }
 .qr-wrap img, .qr-wrap canvas { display: block; }
+#qr-download { display: inline-flex; }
 .danger-h { color: #fca5a5 !important; }
 .danger-h i { color: #f87171; }
 .btn-danger {

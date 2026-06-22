@@ -28,11 +28,14 @@ class WelcomeScreen {
 
         const welcomeText = window.siteConfig?.welcomeScreen?.text || 'Click here to continue';
 
-        welcomeContent.innerHTML = `
-            <button class="welcome-button" id="enter-button">
-                <span>${welcomeText}</span>
-            </button>
-        `;
+        // Build with DOM APIs so a user's welcome text can't inject markup (stored XSS).
+        const button = document.createElement('button');
+        button.className = 'welcome-button';
+        button.id = 'enter-button';
+        const label = document.createElement('span');
+        label.textContent = welcomeText;
+        button.appendChild(label);
+        welcomeContent.appendChild(button);
 
         this.welcomeElement.appendChild(welcomeContent);
         document.body.appendChild(this.welcomeElement);
