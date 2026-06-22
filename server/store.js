@@ -120,5 +120,19 @@ module.exports = {
       console.error('KV deleteGuestbookMessage error:', e);
       return false;
     }
+  },
+  async likeGuestbookMessage(username, id) {
+    try {
+      const key = `guestbook:${lc(username)}`;
+      const messages = (await kv.get(key)) || [];
+      const i = messages.findIndex(m => m.id === id);
+      if (i === -1) return null;
+      messages[i].likes = (messages[i].likes || 0) + 1;
+      await kv.set(key, messages);
+      return messages[i].likes;
+    } catch (e) {
+      console.error('KV likeGuestbookMessage error:', e);
+      return null;
+    }
   }
 };

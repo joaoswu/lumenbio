@@ -331,12 +331,13 @@
     
     list.innerHTML = messages.map(msg => {
       const date = new Date(msg.timestamp).toLocaleString();
+      const likesCount = msg.likes || 0;
       return `
         <li class="gb-message-admin" data-id="${msg.id}">
           <div class="gb-message-admin-meta">
             <span class="gb-message-admin-author">${escHtml(msg.name)}</span>
             <span class="gb-message-admin-text">${escHtml(msg.message)}</span>
-            <span class="gb-message-admin-time">${date}</span>
+            <span class="gb-message-admin-time">${date} • <i class="fas fa-thumbs-up" style="font-size: 0.7rem; opacity: 0.7;" aria-hidden="true"></i> ${likesCount}</span>
           </div>
           <button type="button" class="gb-del-btn" title="Delete message"><i class="fas fa-trash"></i></button>
         </li>

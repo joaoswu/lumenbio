@@ -164,6 +164,9 @@ class GuestbookWidget {
         
         this.listElement.innerHTML = messages.map(msg => {
             const timeStr = this.formatTime(msg.timestamp);
+            const liked = this.hasLiked(msg.id);
+            const thumbClass = liked ? 'fas' : 'far';
+            const likesCount = msg.likes || 0;
             return `
                 <div class="gb-message-card">
                     <div class="gb-message-header">
@@ -171,9 +174,17 @@ class GuestbookWidget {
                         <span class="gb-message-time">${timeStr}</span>
                     </div>
                     <div class="gb-message-text">${this.escapeHTML(msg.message)}</div>
+                    <div class="gb-message-footer">
+                        <button class="gb-like-btn ${liked ? 'liked' : ''}" data-id="${msg.id}" aria-label="Like comment">
+                            <i class="${thumbClass} fa-thumbs-up"></i>
+                            <span class="like-count">${likesCount}</span>
+                        </button>
+                    </div>
                 </div>
             `;
         }).join('');
+
+        this.attachLikeListeners();
     }
     
     setLoading(loading) {
@@ -226,6 +237,62 @@ class GuestbookWidget {
     escapeHTML(str) {
         return String(str || '').replace(/[&<>"']/g, c =>
             ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    
+    hasLiked(msgId) {
+        try {
+            const likedList = JSON.parse(localStorage.getItem('gb_likes') || '[]');
+            return likedList.includes(msgId);
+        } catch (e) {
+            return false;
+        }
+    }
+
+    markAsLiked(msgId) {
+        try {
+            const likedList = JSON.parse(localStorage.getItem('gb_likes') || '[]');
+            if (!likedList.includes(msgId)) {
+                likedList.push(msgId);
+                localStorage.setItem('gb_likes', JSON.stringify(likedList));
+            }
+        } catch (e) {}
+    }
+
+    attachLikeListeners() {
+        const likeBtns = this.listElement.querySelectorAll('.gb-like-btn');
+        likeBtns.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const msgId = btn.getAttribute('data-id');
+                if (!msgId || this.hasLiked(msgId)) return;
+
+                // Optimistic UI updates
+                this.markAsLiked(msgId);
+                btn.classList.add('liked');
+                const icon = btn.querySelector('i');
+                if (icon) {
+                    icon.className = 'fas fa-thumbs-up';
+                }
+                const countEl = btn.querySelector('.like-count');
+                if (countEl) {
+                    const currentCount = parseInt(countEl.textContent || '0', 10);
+                    countEl.textContent = currentCount + 1;
+                }
+
+                // Add bounce animation
+                btn.classList.add('bounce');
+                setTimeout(() => btn.classList.remove('bounce'), 300);
+
+                // API call
+                try {
+                    await fetch(`/api/bio/${this.username}/guestbook/${msgId}/like`, {
+                        method: 'POST'
+                    });
+                } catch (err) {
+                    console.error('Failed to register like:', err);
+                }
+            });
+        });
     }
     
     hideWidget() {

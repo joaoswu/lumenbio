@@ -316,6 +316,29 @@ router.delete('/:username/guestbook/:id', authRequired, async (req, res) => {
   }
 });
 
+router.post('/:username/guestbook/:id/like', async (req, res) => {
+  try {
+    const user = await store.findByUsername(req.params.username);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const gbConfig = (user.config && user.config.guestbook) || {};
+    if (!gbConfig.enabled) {
+      return res.status(400).json({ error: 'Guestbook is not enabled on this profile.' });
+    }
+
+    const id = req.params.id;
+    const likes = await store.likeGuestbookMessage(user.username, id);
+    if (likes === null) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    res.json({ success: true, likes });
+  } catch (e) {
+    console.error('Guestbook like error:', e);
+    res.status(500).json({ error: 'Failed to like guestbook message' });
+  }
+});
+
 router.get('/:username', async (req, res) => {
   const u = await store.findByUsername(req.params.username);
   if (!u) return res.status(404).json({ error: 'Not found' });
