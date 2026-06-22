@@ -34,7 +34,19 @@ module.exports = {
     let dom = refDomain(referer);
     if (selfHost && dom === String(selfHost).toLowerCase()) dom = 'direct'; // ignore internal nav
     entry.referrers[dom] = (entry.referrers[dom] || 0) + 1;
-    
+
+    await save(db);
+  },
+
+  async recordClick(username, label) {
+    if (!username || !label) return;
+    const u = String(username).toLowerCase();
+    const key = String(label).replace(/\s+/g, ' ').trim().slice(0, 80);
+    if (!key) return;
+    const db = await load();
+    const entry = db[u] || (db[u] = { days: {}, referrers: {}, clicks: {} });
+    if (!entry.clicks) entry.clicks = {};
+    entry.clicks[key] = (entry.clicks[key] || 0) + 1;
     await save(db);
   },
 
@@ -52,7 +64,10 @@ module.exports = {
     const referrers = Object.entries(entry.referrers)
       .sort((a, b) => b[1] - a[1]).slice(0, 8)
       .map(([domain, count]) => ({ domain, count }));
+    const clicks = Object.entries(entry.clicks || {})
+      .sort((a, b) => b[1] - a[1]).slice(0, 10)
+      .map(([label, count]) => ({ label, count }));
     const total = Object.values(entry.days).reduce((a, b) => a + b, 0);
-    return { days, referrers, total };
+    return { days, referrers, clicks, total };
   }
 };

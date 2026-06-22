@@ -10,13 +10,26 @@ const store = require('./store');
 const codes = require('./codes');
 const defaultConfig = require('./defaultConfig');
 const rateLimit = require('./rateLimit');
+const mailer = require('./email');
 const PasswordStrength = require('../public/shared/password-strength.js');
+const { Redis } = require('@upstash/redis');
 
+const kv = new Redis({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN });
 const router = express.Router();
 
 const signupLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10, message: 'Too many sign-up attempts. Try again later.' });
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: 'Too many login attempts. Please wait a few minutes.' });
 const redeemLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 15, message: 'Too many code attempts. Try again later.' });
+const forgotLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 8, message: 'Too many reset requests. Try again later.' });
+const resetLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 20, message: 'Too many attempts. Try again later.' });
+
+const PASSWORD_TOO_WEAK = 'Password is too weak — use 8+ characters with a mix of letters, numbers and symbols.';
+function passwordOk(pw) {
+  return pw.length >= 8 && PasswordStrength.score(pw).score >= 2;
+}
+function originOf(req) {
+  return (process.env.PUBLIC_URL || `${req.protocol}://${req.get('host')}`).replace(/\/+$/, '');
+}
 
 // Persisted secret so sessions survive restarts (shared with the unlock token).
 const { getSecret } = require('./secret');
@@ -145,9 +158,89 @@ router.get('/account', authRequired, async (req, res) => {
     createdAt: u.createdAt,
     views: u.views || 0,
     premium: !!u.premium,
-    passwordHash: u.passwordHash,
     token: (req.cookies && req.cookies[COOKIE]) || ''
   });
+});
+
+// ---- Password reset (forgot / reset) ----
+router.post('/forgot', forgotLimiter, async (req, res) => {
+  const email = String(req.body.email || '').trim().toLowerCase();
+  // Always respond identically so we never leak which emails are registered.
+  const generic = { success: true };
+  if (!EMAIL_RE.test(email)) return res.json(generic);
+  try {
+    const user = await store.findByEmail(email);
+    if (user) {
+      const token = crypto.randomBytes(32).toString('hex');
+      await kv.set('reset:' + token, user.id, { ex: 3600 }); // 1 hour
+      const link = `${originOf(req)}/reset?token=${token}`;
+      const msg = mailer.resetEmail(link);
+      await mailer.send({ to: user.email, subject: msg.subject, html: msg.html, text: msg.text });
+    }
+  } catch (e) {
+    console.error('Forgot-password error:', e);
+  }
+  res.json(generic);
+});
+
+router.post('/reset', resetLimiter, async (req, res) => {
+  const token = String(req.body.token || '').trim();
+  const password = String(req.body.password || '');
+  if (!token) return res.status(400).json({ error: 'This reset link is invalid or has expired.' });
+  if (!passwordOk(password)) return res.status(400).json({ error: PASSWORD_TOO_WEAK });
+  try {
+    const userId = await kv.get('reset:' + token);
+    if (!userId) return res.status(400).json({ error: 'This reset link is invalid or has expired.' });
+    const user = await store.findById(String(userId));
+    if (!user) return res.status(400).json({ error: 'This reset link is invalid or has expired.' });
+    await store.update(user.id, { passwordHash: await bcrypt.hash(password, 10) });
+    await kv.del('reset:' + token);
+    res.json({ success: true });
+  } catch (e) {
+    console.error('Reset-password error:', e);
+    res.status(500).json({ error: 'Something went wrong resetting your password.' });
+  }
+});
+
+// ---- Account management (signed-in) ----
+router.post('/change-password', authRequired, async (req, res) => {
+  const u = await store.findById(req.user.id);
+  if (!u) return res.status(404).json({ error: 'User not found' });
+  const current = String(req.body.currentPassword || '');
+  const next = String(req.body.newPassword || '');
+  if (!(await bcrypt.compare(current, u.passwordHash))) {
+    return res.status(400).json({ error: 'Current password is incorrect.' });
+  }
+  if (!passwordOk(next)) return res.status(400).json({ error: PASSWORD_TOO_WEAK });
+  await store.update(u.id, { passwordHash: await bcrypt.hash(next, 10) });
+  res.json({ success: true });
+});
+
+router.post('/change-email', authRequired, async (req, res) => {
+  const u = await store.findById(req.user.id);
+  if (!u) return res.status(404).json({ error: 'User not found' });
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const password = String(req.body.password || '');
+  if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'Please enter a valid email address.' });
+  if (!(await bcrypt.compare(password, u.passwordHash))) {
+    return res.status(400).json({ error: 'Password is incorrect.' });
+  }
+  const existing = await store.findByEmail(email);
+  if (existing && existing.id !== u.id) return res.status(409).json({ error: 'That email is already registered.' });
+  await store.update(u.id, { email });
+  res.json({ success: true, email });
+});
+
+router.post('/delete-account', authRequired, async (req, res) => {
+  const u = await store.findById(req.user.id);
+  if (!u) return res.status(404).json({ error: 'User not found' });
+  const password = String(req.body.password || '');
+  if (!(await bcrypt.compare(password, u.passwordHash))) {
+    return res.status(400).json({ error: 'Password is incorrect.' });
+  }
+  await store.remove(u.id);
+  res.clearCookie(COOKIE);
+  res.json({ success: true });
 });
 
 router.post('/redeem', redeemLimiter, authRequired, async (req, res) => {

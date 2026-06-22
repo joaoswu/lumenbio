@@ -130,3 +130,4 @@ examples/
 backups/
 package-lock.json
 .vercel
+.env*

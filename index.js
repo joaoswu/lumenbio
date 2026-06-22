@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 
 const store = require('./server/store');
 const { router: authRouter } = require('./server/auth');
-const { router: bioRouter, publicConfig } = require('./server/bio');
+const { router: bioRouter, publicConfig, getProfileBadges } = require('./server/bio');
 const { router: adminRouter } = require('./server/admin');
 const billing = require('./server/billing');
 const analytics = require('./server/analytics');
@@ -91,20 +91,73 @@ app.use(async (req, res, next) => {
 app.get('/', sendPage('landing'));
 app.get('/login', sendPage('auth', 'login.html'));
 app.get('/signup', sendPage('auth', 'signup.html'));
+app.get('/forgot', sendPage('auth', 'forgot.html'));
+app.get('/reset', sendPage('auth', 'reset.html'));
 app.get('/dashboard', sendPage('dashboard'));
+app.get('/leaderboard', sendPage('leaderboard'));
 app.get('/admin', sendPage('admin'));
 app.get('/billing/success', billing.successHandler);
 
 // ---- Public bio: /u/:username (config injected server-side) ----
 const BIO_TEMPLATE = path.join(PUBLIC, 'bio', 'index.html');
 
-function renderBio(config) {
+function escapeAttr(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function absUrl(u, origin) {
+  u = String(u || '').trim();
+  if (!u) return '';
+  if (/^https?:\/\//i.test(u)) return u;
+  if (/^\/\//.test(u)) return 'https:' + u;
+  if (u.startsWith('/')) return origin + u;
+  return '';
+}
+
+// Per-user OpenGraph / Twitter tags so shared bio links get a rich preview.
+function buildMeta(cfg, username, origin) {
+  const profile = cfg.profile || {};
+  const name = profile.name || username;
+  const title = `${name} (@${username}) · Lumenbio`;
+  let desc = String(profile.description || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  desc = desc.slice(0, 160) || `${name}'s Lumenbio page`;
+  const url = `${origin}/u/${username}`;
+  const img = absUrl(profile.profileImage, origin);
+  const accent = (cfg.theme && cfg.theme.accentColor) || '#c4313a';
+  const tags = [
+    `<title>${escapeAttr(title)}</title>`,
+    `<meta name="description" content="${escapeAttr(desc)}">`,
+    `<link rel="canonical" href="${escapeAttr(url)}">`,
+    `<meta property="og:type" content="profile">`,
+    `<meta property="og:site_name" content="Lumenbio">`,
+    `<meta property="og:title" content="${escapeAttr(title)}">`,
+    `<meta property="og:description" content="${escapeAttr(desc)}">`,
+    `<meta property="og:url" content="${escapeAttr(url)}">`,
+    `<meta name="twitter:card" content="${img ? 'summary_large_image' : 'summary'}">`,
+    `<meta name="twitter:title" content="${escapeAttr(title)}">`,
+    `<meta name="twitter:description" content="${escapeAttr(desc)}">`,
+    `<meta name="theme-color" content="${escapeAttr(accent)}">`
+  ];
+  if (img) {
+    tags.push(`<meta property="og:image" content="${escapeAttr(img)}">`);
+    tags.push(`<meta name="twitter:image" content="${escapeAttr(img)}">`);
+  }
+  return tags.join('\n    ');
+}
+
+function originOf(req) {
+  return (process.env.PUBLIC_URL || `${req.protocol}://${req.get('host')}`).replace(/\/+$/, '');
+}
+
+function renderBio(config, metaHtml) {
   const template = fs.readFileSync(BIO_TEMPLATE, 'utf8');
   // Config -> non-executable JSON block. Escaping "<" prevents "</script>" breakout.
   const json = JSON.stringify(config).replace(/</g, '\\u003c');
   // Custom CSS -> <style> block. Neutralize any "</" so it can't break out of the tag.
   const css = String(config.customCss || '').replace(/<\//g, '<\\/');
   return template
+    .replace('<!--__LUMEN_META__-->', metaHtml || '')
     .replace('/*__LUMEN_CONFIG__*/', json)
     .replace('/*__CUSTOM_CSS__*/', css);
 }
@@ -150,6 +203,9 @@ async function serveBio(user, req, res) {
   const cfg = publicConfig(user.config); // strips password hash
   cfg.views = views;
   cfg.premium = !!user.premium;
+  cfg.username = user.username; // used by the client for link-click tracking
+  cfg.profile = cfg.profile || {};
+  cfg.profile.badges = await getProfileBadges(user);
   if (!user.premium) { // defensive re-gate
     cfg.customLinks = [];
     cfg.removeBranding = false;
@@ -161,7 +217,8 @@ async function serveBio(user, req, res) {
 
   try {
     res.set('Cache-Control', 'no-cache');
-    res.send(renderBio(cfg));
+    const meta = buildMeta(cfg, user.username, originOf(req));
+    res.send(renderBio(cfg, meta));
   } catch (e) {
     console.error('Bio render error:', e);
     res.status(500).send('Could not render this page.');

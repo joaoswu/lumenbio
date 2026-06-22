@@ -50,6 +50,10 @@
 
 .field { margin-bottom: 16px; }
 .field label { display: block; font-size: 0.78rem; color: var(--text-2); margin-bottom: 7px; font-weight: 500; }
+.field-head { display: flex; align-items: baseline; justify-content: space-between; }
+.field-head label { margin-bottom: 7px; }
+.field-link { font-size: 0.74rem; color: var(--accent); text-decoration: none; font-weight: 500; }
+.field-link:hover { text-decoration: underline; }
 .input-wrap { position: relative; }
 .input-wrap > i {
     position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
@@ -123,6 +127,18 @@
     font-size: 0.82rem;
 }
 .auth-error[hidden] { display: none; }
+
+.auth-ok {
+    margin-top: 16px;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.35);
+    color: #86efac;
+    border-radius: 11px;
+    padding: 11px 14px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+.auth-ok[hidden] { display: none; }
 
 .auth-alt { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-2); }
 .auth-alt a { color: var(--accent); text-decoration: none; font-weight: 500; }

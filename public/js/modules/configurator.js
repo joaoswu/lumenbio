@@ -319,7 +319,25 @@ function setupProfile(profile) {
 
     const nameElement = document.getElementById('profile-name');
     if (nameElement) {
-        nameElement.textContent = profile.name;
+        nameElement.innerHTML = '';
+        
+        const nameText = document.createElement('span');
+        nameText.className = 'profile-name-text';
+        nameText.textContent = profile.name;
+        nameElement.appendChild(nameText);
+        
+        if (Array.isArray(profile.badges) && profile.badges.length > 0) {
+            const badgesSpan = document.createElement('span');
+            badgesSpan.className = 'profile-badges';
+            profile.badges.forEach(b => {
+                const icon = document.createElement('i');
+                icon.className = `${b.icon} profile-badge`;
+                icon.style.color = b.color;
+                icon.title = b.label;
+                badgesSpan.appendChild(icon);
+            });
+            nameElement.appendChild(badgesSpan);
+        }
     }
     
 

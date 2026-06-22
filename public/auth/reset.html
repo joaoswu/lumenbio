@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="dark">
   <link rel="icon" type="image/png" href="/favicon.png?v=2">
-  <title>Sign up · Lumenbio</title>
+  <title>Choose a new password · Lumenbio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
@@ -21,57 +21,31 @@
     <a class="auth-brand" href="/"><span class="logo"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></span> Lumenbio</a>
 
     <div class="auth-card glass">
-      <h1>Create your page</h1>
-      <p class="auth-sub">Claim your username — it's free during early access.</p>
+      <h1>Choose a new password</h1>
+      <p class="auth-sub">Pick a strong password you don't use anywhere else.</p>
 
-      <form id="signup-form" novalidate>
+      <form id="reset-form" novalidate>
         <div class="field">
-          <label for="username">Username</label>
-          <div class="input-wrap">
-            <i class="fas fa-at"></i>
-            <input type="text" id="username" name="username" placeholder="yourname" autocomplete="username" maxlength="20" required>
-          </div>
-          <div class="field-hint" id="username-hint">Your page will be <b class="mono" id="url-preview">lumenbio/u/yourname</b></div>
-        </div>
-
-        <div class="field">
-          <label for="email">Email</label>
-          <div class="input-wrap">
-            <i class="fas fa-envelope"></i>
-            <input type="email" id="email" name="email" placeholder="you@email.com" autocomplete="email" required>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="password">Password</label>
+          <label for="password">New password</label>
           <div class="input-wrap">
             <i class="fas fa-lock"></i>
-            <input type="password" id="password" name="password" placeholder="Create a strong password" autocomplete="new-password" required>
+            <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="new-password" required>
             <button type="button" class="toggle-pass" data-target="password" aria-label="Show password"><i class="fas fa-eye"></i></button>
           </div>
-
           <div class="strength" id="strength" hidden>
             <div class="strength-bars"><span></span><span></span><span></span><span></span></div>
-            <div class="strength-label" id="strength-label">Strength: <b>—</b></div>
-            <ul class="strength-checks" id="strength-checks">
-              <li data-k="length">8+ characters</li>
-              <li data-k="upper">Uppercase</li>
-              <li data-k="lower">Lowercase</li>
-              <li data-k="number">Number</li>
-              <li data-k="symbol">Symbol</li>
-              <li data-k="long">12+ (bonus)</li>
-            </ul>
+            <div class="strength-label" id="strength-label"></div>
           </div>
         </div>
 
         <button type="submit" class="btn btn-primary auth-submit" id="submit-btn">
-          <i class="fas fa-wand-magic-sparkles"></i> Create my page
+          <i class="fas fa-check"></i> Update password
         </button>
         <div class="auth-error" id="auth-error" hidden></div>
-        <p class="cap-note" id="cap-note"></p>
+        <div class="auth-ok" id="auth-ok" hidden></div>
       </form>
 
-      <p class="auth-alt">Already have a page? <a href="/login">Log in →</a></p>
+      <p class="auth-alt"><a href="/login">Back to log in →</a></p>
     </div>
   </div>
 

@@ -67,6 +67,14 @@ module.exports = {
     await save(db);
     return u;
   },
+  async remove(id) {
+    const db = await load();
+    const i = db.users.findIndex(x => x.id === id);
+    if (i === -1) return false;
+    db.users.splice(i, 1);
+    await save(db);
+    return true;
+  },
   async incrementViews(username) {
     const db = await load();
     const u = db.users.find(x => x.username === lc(username));

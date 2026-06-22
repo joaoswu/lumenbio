@@ -159,6 +159,18 @@ router.put('/', authRequired, async (req, res) => {
   res.json({ success: true, config: publicConfig(merged) });
 });
 
+// Public link-click beacon (fired by clickTracker.js on the bio page).
+router.post('/:username/click', async (req, res) => {
+  try {
+    const u = await store.findByUsername(req.params.username);
+    if (u) {
+      const label = String((req.body && req.body.label) || '').slice(0, 80);
+      if (label) await analytics.recordClick(u.username, label);
+    }
+  } catch (e) { /* best-effort */ }
+  res.status(204).end();
+});
+
 router.post('/:username/unlock', async (req, res) => {
   const u = await store.findByUsername(req.params.username);
   if (!u || !u.config.passwordProtect || !u.config.passwordProtect.hash) {
@@ -174,10 +186,47 @@ router.post('/:username/unlock', async (req, res) => {
   res.json({ success: true });
 });
 
+async function getProfileBadges(user) {
+  const badges = [];
+  const isAdmin = await store.isAdmin(user);
+  if (isAdmin) {
+    badges.push({ type: 'owner', icon: 'fas fa-crown', label: 'Owner', color: '#ffd700' });
+  }
+  if (user.verified || ['joaosw', 'joao'].includes(user.username)) {
+    badges.push({ type: 'verified', icon: 'fas fa-circle-check', label: 'Verified', color: 'var(--accent)' });
+  }
+  if (user.premium) {
+    badges.push({ type: 'premium', icon: 'fas fa-gem', label: 'Premium', color: '#ff4a7d' });
+  }
+  return badges;
+}
+
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const users = await store.all();
+    const topUsers = await Promise.all(users.map(async u => ({
+      username: u.username,
+      name: (u.config && u.config.profile && u.config.profile.name) || u.username,
+      description: (u.config && u.config.profile && u.config.profile.description) || '',
+      profileImage: (u.config && u.config.profile && u.config.profile.profileImage) || '',
+      views: u.views || 0,
+      premium: !!u.premium,
+      badges: await getProfileBadges(u)
+    })));
+    topUsers.sort((a, b) => b.views - a.views);
+    res.json({ success: true, leaderboard: topUsers.slice(0, 25) });
+  } catch (e) {
+    console.error('Leaderboard fetch error:', e);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
 router.get('/:username', async (req, res) => {
   const u = await store.findByUsername(req.params.username);
   if (!u) return res.status(404).json({ error: 'Not found' });
-  res.json({ username: u.username, config: publicConfig(u.config), views: u.views || 0 });
+  const cfg = publicConfig(u.config);
+  cfg.profile.badges = await getProfileBadges(u);
+  res.json({ username: u.username, config: cfg, views: u.views || 0 });
 });
 
-module.exports = { router, mergeConfig, publicConfig };
+module.exports = { router, mergeConfig, publicConfig, getProfileBadges };

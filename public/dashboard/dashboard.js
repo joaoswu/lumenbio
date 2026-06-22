@@ -287,6 +287,10 @@
     if (refs) refs.innerHTML = data.referrers.length
       ? data.referrers.map(r => `<li><span>${escHtml(r.domain)}</span><span>${r.count}</span></li>`).join('')
       : '<li class="an-empty">No referrers yet</li>';
+    const links = document.getElementById('an-links');
+    if (links) links.innerHTML = (data.clicks && data.clicks.length)
+      ? data.clicks.map(c => `<li><span>${escHtml(c.label)}</span><span>${c.count}</span></li>`).join('')
+      : '<li class="an-empty">No link clicks yet</li>';
   }
 
   function loadAnalytics() {
@@ -317,6 +321,53 @@
   function updatePwHint() {
     const hint = document.getElementById('pw-hint');
     if (hint) hint.textContent = (currentConfig && currentConfig.passwordProtect && currentConfig.passwordProtect.hasPassword) ? '— password set ✓' : '';
+  }
+
+  // ---- theme presets ----
+  const PRESETS = {
+    crimson:  { accent: '#c4313a', count: 60 },
+    midnight: { accent: '#6366f1', count: 70 },
+    cyber:    { accent: '#22d3ee', count: 90 },
+    sakura:   { accent: '#f472b6', count: 50 },
+    matrix:   { accent: '#34d399', count: 80 },
+    mono:     { accent: '#e5e7eb', count: 40 }
+  };
+  function applyPreset(name) {
+    const p = PRESETS[name];
+    if (!p) return;
+    const set = (path, val) => { const el = document.querySelector('[data-path="' + path + '"]'); if (el) setField(el, val); };
+    set('theme.accentColor', p.accent);
+    set('theme.particles.color', p.accent);
+    set('theme.particles.count', p.count);
+    set('theme.particles.enabled', true);
+    set('theme.effects.bloom.enabled', true);
+    document.querySelectorAll('#theme-presets .preset').forEach(b => b.classList.toggle('active', b.dataset.preset === name));
+    setDirty(true);
+    toast('Preset applied — Save to publish');
+  }
+
+  // ---- QR code ----
+  function renderQr() {
+    const el = document.getElementById('qr-code');
+    if (!el || typeof QRCode === 'undefined' || !username) return;
+    el.innerHTML = '';
+    new QRCode(el, {
+      text: window.location.origin + '/u/' + username,
+      width: 168, height: 168,
+      colorDark: '#0b0809', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+  function downloadQr() {
+    const el = document.getElementById('qr-code');
+    const canvas = el && el.querySelector('canvas');
+    const img = el && el.querySelector('img');
+    const dataUrl = canvas ? canvas.toDataURL('image/png') : (img && img.src) || '';
+    if (!dataUrl) return toast('QR not ready yet', true);
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = (username || 'lumenbio') + '-qr.png';
+    document.body.appendChild(a); a.click(); a.remove();
   }
 
   // ---- wire up ----
@@ -359,6 +410,68 @@
     // add a custom link (premium)
     const clAdd = document.getElementById('cl-add');
     if (clAdd) clAdd.addEventListener('click', () => { customLinks.push({ label: '', url: '' }); renderCL(); setDirty(true); });
+
+    // theme presets
+    const presets = document.getElementById('theme-presets');
+    if (presets) presets.addEventListener('click', (e) => {
+      const b = e.target.closest('.preset');
+      if (b) applyPreset(b.dataset.preset);
+    });
+
+    // QR download
+    const qrDl = document.getElementById('qr-download');
+    if (qrDl) qrDl.addEventListener('click', downloadQr);
+
+    // account: change password
+    const cpSave = document.getElementById('cp-save');
+    if (cpSave) cpSave.addEventListener('click', async () => {
+      const current = document.getElementById('cp-current').value;
+      const next = document.getElementById('cp-new').value;
+      if (!current || !next) return toast('Fill in both password fields.', true);
+      cpSave.disabled = true;
+      try {
+        const r = await fetch('/api/auth/change-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ currentPassword: current, newPassword: next }) });
+        const d = await r.json();
+        if (!r.ok || !d.success) throw new Error(d.error || 'Could not update password.');
+        document.getElementById('cp-current').value = '';
+        document.getElementById('cp-new').value = '';
+        toast('Password updated ✓');
+      } catch (e) { toast(e.message, true); }
+      finally { cpSave.disabled = false; }
+    });
+
+    // account: change email
+    const ceSave = document.getElementById('ce-save');
+    if (ceSave) ceSave.addEventListener('click', async () => {
+      const email = document.getElementById('ce-email').value.trim();
+      const pass = document.getElementById('ce-pass').value;
+      if (!email || !pass) return toast('Enter your new email and current password.', true);
+      ceSave.disabled = true;
+      try {
+        const r = await fetch('/api/auth/change-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password: pass }) });
+        const d = await r.json();
+        if (!r.ok || !d.success) throw new Error(d.error || 'Could not update email.');
+        document.getElementById('ce-pass').value = '';
+        const ev = document.getElementById('acct-email'); if (ev) ev.textContent = d.email || email;
+        toast('Email updated ✓');
+      } catch (e) { toast(e.message, true); }
+      finally { ceSave.disabled = false; }
+    });
+
+    // account: delete
+    const delBtn = document.getElementById('del-acct');
+    if (delBtn) delBtn.addEventListener('click', async () => {
+      const pass = document.getElementById('del-pass').value;
+      if (!pass) return toast('Enter your password to confirm.', true);
+      if (!confirm('Delete your account permanently? This cannot be undone.')) return;
+      delBtn.disabled = true;
+      try {
+        const r = await fetch('/api/auth/delete-account', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pass }) });
+        const d = await r.json();
+        if (!r.ok || !d.success) throw new Error(d.error || 'Could not delete account.');
+        window.location.href = '/';
+      } catch (e) { toast(e.message, true); delBtn.disabled = false; }
+    });
 
     // redeem premium code
     const redeemBtn = document.getElementById('redeem-btn');
@@ -440,9 +553,9 @@
         $('#acct-email').textContent = a.email || '—';
         $('#acct-since').textContent = a.createdAt ? new Date(a.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
         $('#acct-views').textContent = (a.views || 0).toLocaleString();
-        $('#acct-pass').textContent = a.passwordHash || '—';
         $('#acct-cookie').textContent = a.token || '—';
         setPremium(a.premium);
+        renderQr();
       } catch (e) {
         accountLoaded = false;
         toast('Could not load account info', true);

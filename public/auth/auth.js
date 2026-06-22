@@ -19,6 +19,9 @@
   }
   function clearError() { if (errorBox) errorBox.hidden = true; }
 
+  const okBox = document.getElementById('auth-ok');
+  function showOk(msg) { if (okBox) { okBox.textContent = msg; okBox.hidden = false; } }
+
   async function submit(url, payload, btn) {
     clearError();
     const original = btn.innerHTML;
@@ -94,6 +97,79 @@
         return showError('Please choose a stronger password (8+ chars, mix of letters, numbers & symbols).');
       }
       submit('/api/auth/signup', { username, email, password }, document.getElementById('submit-btn'));
+    });
+  }
+
+  // ---- Forgot password ----
+  const forgotForm = document.getElementById('forgot-form');
+  if (forgotForm) {
+    forgotForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+      const email = document.getElementById('email').value.trim();
+      if (!email) return showError('Please enter your email.');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+      try {
+        await fetch('/api/auth/forgot', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+      } catch (err) { /* respond the same either way */ }
+      forgotForm.querySelectorAll('.field, .auth-submit').forEach(el => el.style.display = 'none');
+      showOk("If an account exists for that email, a reset link is on its way. Check your inbox (and spam folder).");
+    });
+  }
+
+  // ---- Reset password ----
+  const resetForm = document.getElementById('reset-form');
+  if (resetForm) {
+    const token = new URLSearchParams(location.search).get('token') || '';
+    const pwInput = document.getElementById('password');
+    const strength = document.getElementById('strength');
+    const strengthLabel = document.getElementById('strength-label');
+    if (!token) showError('This reset link is invalid or has expired. Request a new one from the login page.');
+
+    if (pwInput && strength && window.PasswordStrength) {
+      pwInput.addEventListener('input', () => {
+        const val = pwInput.value;
+        if (!val) { strength.hidden = true; return; }
+        strength.hidden = false;
+        const res = window.PasswordStrength.score(val);
+        strength.dataset.score = res.score;
+        if (strengthLabel) strengthLabel.innerHTML = 'Strength: <b>' + res.label + '</b>';
+      });
+    }
+
+    resetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+      if (!token) return showError('This reset link is invalid or has expired.');
+      const password = pwInput.value;
+      const res = window.PasswordStrength ? window.PasswordStrength.score(password) : { score: 2 };
+      if (password.length < 8 || res.score < 2) {
+        return showError('Please choose a stronger password (8+ chars, mix of letters, numbers & symbols).');
+      }
+      const btn = document.getElementById('submit-btn');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating…';
+      try {
+        const resp = await fetch('/api/auth/reset', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, password })
+        });
+        const data = await resp.json();
+        if (!resp.ok || !data.success) throw new Error(data.error || 'Could not reset your password.');
+        resetForm.querySelectorAll('.field, .auth-submit').forEach(el => el.style.display = 'none');
+        showOk('Password updated ✓ Taking you to the login page…');
+        setTimeout(() => { window.location.href = '/login'; }, 1500);
+      } catch (err) {
+        showError(err.message);
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
     });
   }
 
