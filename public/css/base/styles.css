@@ -738,6 +738,9 @@ body::-webkit-scrollbar {
     gap: 0.5rem;
     font-size: 0.8rem;
     font-weight: 600;
+    color: var(--color-text);
+}
+
 /* GitHub Premium Profile Card */
 .gh-profile-card {
     display: flex;
