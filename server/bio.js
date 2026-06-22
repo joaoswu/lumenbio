@@ -74,6 +74,15 @@ function normalizeDomain(d) {
   return d.slice(0, 100);
 }
 
+function isPayhipUrl(u) {
+  try {
+    const url = new URL(u);
+    return url.hostname === 'payhip.com' || url.hostname.endsWith('.payhip.com');
+  } catch (e) {
+    return false;
+  }
+}
+
 function publicConfig(config) {
   const c = JSON.parse(JSON.stringify(config || {}));
   const enabled = !!(c.passwordProtect && c.passwordProtect.enabled && c.passwordProtect.hash);
@@ -127,7 +136,14 @@ router.put('/', authRequired, async (req, res) => {
 
   if (isPlainObject(merged.socialMedia)) {
     for (const k of Object.keys(merged.socialMedia)) {
-      if (merged.socialMedia[k]) merged.socialMedia[k] = safeUrl(merged.socialMedia[k]);
+      if (merged.socialMedia[k]) {
+        const url = safeUrl(merged.socialMedia[k]);
+        if (k === 'payhip' && !isPayhipUrl(url)) {
+          merged.socialMedia[k] = '';
+        } else {
+          merged.socialMedia[k] = url;
+        }
+      }
     }
   }
 

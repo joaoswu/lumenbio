@@ -70,12 +70,32 @@ function goTo(step) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+function isPayhipUrl(u) {
+  try {
+    const url = new URL(u);
+    return url.hostname === 'payhip.com' || url.hostname.endsWith('.payhip.com');
+  } catch (e) {
+    return false;
+  }
+}
+
 function validateStep(step) {
   if (step === 1) {
     const name = document.getElementById('name').value.trim();
     const desc = document.getElementById('description').value.trim();
     if (!name) { alert('Please enter your display name.'); return false; }
     if (!desc) { alert('Please enter a description.'); return false; }
+  }
+  if (step === 2) {
+    const payhipEl = document.querySelector('input[name="payhip"]');
+    if (payhipEl && payhipEl.value.trim()) {
+      let val = payhipEl.value.trim();
+      if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
+      if (!isPayhipUrl(val)) {
+        alert('Payhip URL must be a valid payhip.com link.');
+        return false;
+      }
+    }
   }
   if (step === 3) {
     if (document.getElementById('discordEnabled').checked) {
@@ -164,7 +184,7 @@ setupPreview('bg-file', 'bg-preview', 'bg-icon', 'bg-hint');
 function buildReview() {
   const form = document.getElementById('setup-form');
   const d = formValues(form);
-  const socials = ['github', 'twitter', 'steam', 'vrchat', 'osu', 'instagram', 'tiktok', 'youtube', 'namemc']
+  const socials = ['github', 'twitter', 'steam', 'vrchat', 'osu', 'instagram', 'tiktok', 'youtube', 'namemc', 'payhip']
     .filter(k => d[k]).join(', ') || 'none';
   const checked = id => document.getElementById(id).checked;
   const songCount = (document.getElementById('songs-file').files || []).length;

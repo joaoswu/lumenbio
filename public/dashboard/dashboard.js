@@ -44,6 +44,15 @@
     }
   }
 
+  function isPayhipUrl(u) {
+    try {
+      const url = new URL(u);
+      return url.hostname === 'payhip.com' || url.hostname.endsWith('.payhip.com');
+    } catch (e) {
+      return false;
+    }
+  }
+
   // ---- toast ----
   const toastEl = $('#toast');
   let toastTimer;
@@ -142,6 +151,15 @@
 
   // ---- save ----
   async function save(btn) {
+    const payhipEl = document.querySelector('[data-path="socialMedia.payhip"]');
+    if (payhipEl && payhipEl.value.trim()) {
+      let val = payhipEl.value.trim();
+      if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
+      if (!isPayhipUrl(val)) {
+        toast('Payhip URL must be a valid payhip.com link.', true);
+        return;
+      }
+    }
     const clone = JSON.parse(JSON.stringify(currentConfig || {}));
     fields().forEach(el => setPath(clone, el.dataset.path, fieldValue(el)));
     setPath(clone, 'musicPlayer.tracks', musicTracks
