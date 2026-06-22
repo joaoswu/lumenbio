@@ -1,14 +1,14 @@
 /**
- * Performance guard with adaptive fallback.
+ * Performance guard with adaptive, self-escalating fallback.
  *
  * Bio-page lag is almost always GPU compositing: particles + the drifting glow
  * animate behind ~8 backdrop-filter glass regions, forcing a full recomposite
- * every frame. Two layers of defence:
- *   1. Spec sniffing (mobile / low RAM / few cores / reduced-motion) -> `lite`
- *      immediately, before particles initialise.
- *   2. Runtime FPS check after load — catches weak GPUs that look fine on paper
- *      (mid-range laptops, old integrated graphics). Escalates to `lite`, or
- *      `potato` (blur off entirely) when it's really struggling.
+ * every frame. Spec sniffing alone misses weak desktops (they report plenty of
+ * cores/RAM), so we ALSO measure the real frame rate after load and step down
+ * through tiers until the page is actually smooth:
+ *
+ *   full  -> lite   : kill particles + heavy behind-glass animations
+ *   lite  -> potato : drop backdrop-filter blur entirely (blur(0))
  */
 (function () {
   var docEl = document.documentElement;
@@ -32,9 +32,13 @@
     } catch (e) { /* noop */ }
   }
 
-  function setTier(tier) { // 'lite' or 'potato'
+  // tier: 1 = lite, 2 = potato
+  var current = 0;
+  function applyTier(tier) {
+    if (tier < 1 || tier <= current) return;
+    current = tier;
     docEl.classList.add('lite');
-    if (tier === 'potato') docEl.classList.add('potato');
+    if (tier >= 2) docEl.classList.add('potato');
     vetoParticles();
     killParticles();
   }
@@ -45,30 +49,37 @@
     (navigator.deviceMemory && navigator.deviceMemory <= 4) ||
     (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
     (mq && mq('(prefers-reduced-motion: reduce)').matches);
-  if (liteBySpec) { docEl.classList.add('lite'); vetoParticles(); }
+  if (liteBySpec) applyTier(1);
 
-  // --- 2. Adaptive: measure real frame rate after load and degrade if poor ---
-  function measureFps() {
-    if (docEl.classList.contains('potato')) return;
+  // --- 2. Adaptive: measure FPS, drop a tier if poor, then re-measure ---
+  var MIN_FPS = 50;
+  function sampleFps(cb) {
     var frames = 0, start = 0, aborted = false;
     function onVis() { if (document.hidden) aborted = true; }
     document.addEventListener('visibilitychange', onVis);
     function tick(now) {
-      if (aborted || document.hidden) { document.removeEventListener('visibilitychange', onVis); return; }
+      if (aborted || document.hidden) { document.removeEventListener('visibilitychange', onVis); return; } // ignore hidden tabs
       if (!start) start = now;
       frames++;
       var elapsed = now - start;
-      if (elapsed >= 1600) {
+      if (elapsed >= 1200) {
         document.removeEventListener('visibilitychange', onVis);
-        var fps = (frames * 1000) / elapsed;
-        if (fps < 32) setTier('potato');       // genuinely struggling — drop blur entirely
-        else if (fps < 50) setTier('lite');     // janky — kill particles + heavy effects
+        cb((frames * 1000) / elapsed);
         return;
       }
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
   }
-  // Let layout settle, then sample. rAF starvation shows up as a low frame count.
-  window.addEventListener('load', function () { setTimeout(measureFps, 500); });
+
+  function autoTune() {
+    sampleFps(function (fps) {
+      if (fps >= MIN_FPS || current >= 2) return; // smooth enough, or already at the floor
+      applyTier(current + 1);
+      setTimeout(autoTune, 400); // let the change settle, then re-check
+    });
+  }
+
+  // Let layout settle, then start tuning.
+  window.addEventListener('load', function () { setTimeout(autoTune, 500); });
 })();
