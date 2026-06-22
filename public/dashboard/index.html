@@ -243,6 +243,22 @@
             <div class="f"><label>Last.fm API key</label><input type="text" data-path="lastfm.apiKey" placeholder="97cee68c…"></div>
           </div>
 
+          <div class="toggle"><div class="tlabel">GitHub contribution graph<small>Show your coding activity</small></div>
+            <label class="switch"><input type="checkbox" data-path="integrations.github.enabled"><span class="slider"></span></label></div>
+          <div class="f"><label>GitHub username</label><input type="text" data-path="integrations.github.username" placeholder="octocat"></div>
+
+          <div class="toggle"><div class="tlabel">Twitch status<small>Show if you are live</small></div>
+            <label class="switch"><input type="checkbox" data-path="integrations.twitch.enabled"><span class="slider"></span></label></div>
+          <div class="f"><label>Twitch username</label><input type="text" data-path="integrations.twitch.username" placeholder="ninja"></div>
+
+          <div class="toggle"><div class="tlabel">Local weather<small>Show current temperature & conditions</small></div>
+            <label class="switch"><input type="checkbox" data-path="integrations.weather.enabled"><span class="slider"></span></label></div>
+          <div class="f"><label>City / Location</label><input type="text" data-path="integrations.weather.location" placeholder="London"></div>
+
+          <div class="toggle"><div class="tlabel">Steam status<small>Show your current game</small></div>
+            <label class="switch"><input type="checkbox" data-path="integrations.steam.enabled"><span class="slider"></span></label></div>
+          <div class="f"><label>Steam ID64</label><input type="text" data-path="integrations.steam.steamId" placeholder="76561197960287930"><div class="hint">Use your 17-digit SteamID64. Profile must be public.</div></div>
+
           <div class="toggle"><div class="tlabel">Rotating locations<small>Cycle through a list on your page</small></div>
             <label class="switch"><input type="checkbox" data-path="locations.enabled"><span class="slider"></span></label></div>
           <div class="f"><label>Locations <span class="hint">(one per line)</span></label><textarea data-type="list" data-path="locations.list" placeholder="Visual Studio Code&#10;Silent Hill"></textarea></div>

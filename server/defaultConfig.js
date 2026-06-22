@@ -23,6 +23,12 @@ module.exports = function defaultConfig(username, displayName) {
     lastfm: { enabled: false, username: '', apiKey: '' },
     discord: { enabled: false, userId: '', updateInterval: 5000, useWebSocket: true, showBadges: true },
     musicPlayer: { enabled: false, volume: 50, autoplay: false, tracks: [] },
+    integrations: {
+      github: { enabled: false, username: '' },
+      twitch: { enabled: false, username: '' },
+      weather: { enabled: false, location: '' },
+      steam: { enabled: false, steamId: '' }
+    },
     features: { viewCounter: true },
     customLinks: [],
     removeBranding: false,
