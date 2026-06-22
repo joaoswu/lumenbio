@@ -333,7 +333,7 @@ function setupProfile(profile) {
                 const icon = document.createElement('i');
                 icon.className = `${b.icon} profile-badge`;
                 icon.style.color = b.color;
-                icon.title = b.label;
+                icon.setAttribute('aria-label', b.label);
                 badgesSpan.appendChild(icon);
             });
             nameElement.appendChild(badgesSpan);

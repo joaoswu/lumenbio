@@ -294,7 +294,7 @@ class DiscordWidget {
         }
         
         return badges.map(badge => 
-            `<img src="${badge.url}" alt="${badge.key}" class="discord-badge ${badge.key}" title="${badge.title}">`
+            `<img src="${badge.url}" alt="${badge.key}" class="discord-badge ${badge.key}" aria-label="${badge.title}">`
         ).join('');
     }
     

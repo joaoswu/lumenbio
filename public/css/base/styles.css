@@ -1242,3 +1242,43 @@ body.has-np footer { bottom: 96px; transition: bottom 0.6s var(--ease-out-soft);
 .profile-badge:hover {
     transform: scale(1.15);
 }
+
+/* Tooltips for badges */
+.discord-badge,
+.profile-badge {
+    position: relative;
+}
+
+.discord-badge::after,
+.profile-badge::after {
+    content: attr(aria-label);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(15, 15, 18, 0.92);
+    border: 1px solid var(--glass-border);
+    color: var(--color-text);
+    font-size: 0.62rem;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    transition: opacity var(--transition-base), transform var(--transition-base);
+    z-index: 100;
+}
+
+.discord-badge:hover::after,
+.profile-badge:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+@media (hover: none) {
+    .discord-badge::after,
+    .profile-badge::after { display: none; }
+}
