@@ -39,7 +39,7 @@
     audio.volume = Math.min(1, Math.max(0, (cfg.volume != null ? cfg.volume : 50) / 100));
     if (vol) vol.value = Math.round(audio.volume * 100);
 
-    let idx = 0, playing = false, actx, analyser, freq, rafId = null, artToken = 0, jmtPromise;
+    let idx = 0, playing = false, actx, analyser, freq, rafId = null, artToken = 0, jmtPromise, corsFallback = false;
 
     const accent = () =>
       getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || '#c4313a';
@@ -128,7 +128,7 @@
     }
 
     function ensureGraph() {
-      if (actx) return;
+      if (actx || corsFallback) return; // never build the graph after a no-CORS fallback (it would mute playback)
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       try {
@@ -169,9 +169,12 @@
 
     function updateBtn() { playBtn.innerHTML = playing ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>'; }
     function play() {
-      ensureGraph();
       if (actx && actx.state === 'suspended') actx.resume();
-      audio.play().then(() => { playing = true; updateBtn(); if (analyser && !rafId) draw(); }).catch(() => {});
+      audio.play().then(() => {
+        playing = true; updateBtn();
+        if (!corsFallback) ensureGraph(); // build the analyser only after a successful load
+        if (analyser && !rafId) draw();
+      }).catch(() => { /* autoplay blocked or load failed — error handler recovers */ });
     }
     function pause() { audio.pause(); playing = false; updateBtn(); if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
 
@@ -180,6 +183,17 @@
     nextBtn.addEventListener('click', () => loadTrack(idx + 1, true));
     audio.addEventListener('ended', () => loadTrack(idx + 1, true));
     audio.addEventListener('error', () => {
+      // crossOrigin needs the file host to send CORS headers; when it doesn't,
+      // the browser blocks playback entirely. Retry once without crossOrigin so
+      // audio still plays (we just can't draw the waveform for that source).
+      if (audio.crossOrigin && !corsFallback) {
+        corsFallback = true;
+        const url = tracks[idx] && tracks[idx].url;
+        audio.removeAttribute('crossorigin');
+        audio.crossOrigin = null;
+        if (url) { audio.src = url; audio.load(); if (playing) audio.play().catch(() => {}); }
+        return;
+      }
       console.warn('Track failed to load, skipping to next track...');
       if (tracks.length > 1) setTimeout(() => loadTrack(idx + 1, true), 1000);
     });

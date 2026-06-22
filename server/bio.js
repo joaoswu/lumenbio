@@ -56,7 +56,8 @@ router.post('/songs', authRequired, upload.single('song'), async (req, res) => {
     res.json({ success: true, url: blob.url, title });
   } catch (e) {
     console.error('Blob upload error:', e);
-    res.status(500).json({ error: 'Failed to upload song.' });
+    const noStore = /token|BLOB_READ_WRITE|no store|not.*configured/i.test(e.message || '');
+    res.status(noStore ? 503 : 500).json({ error: noStore ? 'File storage is not set up on this server yet.' : 'Failed to upload song.' });
   }
 });
 
@@ -72,7 +73,8 @@ router.post('/image', authRequired, imageUpload.single('image'), async (req, res
     res.json({ success: true, url: blob.url });
   } catch (e) {
     console.error('Image upload error:', e);
-    res.status(500).json({ error: 'Failed to upload image.' });
+    const noStore = /token|BLOB_READ_WRITE|no store|not.*configured/i.test(e.message || '');
+    res.status(noStore ? 503 : 500).json({ error: noStore ? 'File storage is not set up on this server yet.' : 'Failed to upload image.' });
   }
 });
 
