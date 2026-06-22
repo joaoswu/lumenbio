@@ -116,6 +116,12 @@ html.lite #profile-name,
 html.lite .bloom-text,
 html.lite .status-dot { animation: none !important; }
 
+/* Potato tier: applied when measured FPS is very low. blur(0) removes the
+   expensive convolution while the card keeps its translucent fill, so layout
+   and readability are unchanged but compositing gets dramatically cheaper. */
+html.potato { --glass-blur: 0px; }
+html.potato #background-overlay { filter: none !important; }
+
 /* 3D tilt layer */
 .tilt-wrap {
     transform-style: preserve-3d;
