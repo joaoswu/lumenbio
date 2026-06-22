@@ -743,6 +743,7 @@ body::-webkit-scrollbar {
 
 .github-chart {
     width: 100%;
+    height: auto;
     border-radius: 4px;
     opacity: 0.9;
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
@@ -751,6 +752,18 @@ body::-webkit-scrollbar {
 
 .github-card:hover .github-chart {
     opacity: 1;
+}
+
+@media (min-width: 1025px) {
+    .floating-github {
+        position: fixed;
+        bottom: 2rem;
+        left: 2rem;
+        width: 320px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        margin-top: 0;
+        z-index: 100;
+    }
 }
 
 /* ============================================================

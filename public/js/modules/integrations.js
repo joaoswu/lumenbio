@@ -112,27 +112,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // GitHub Stats
     if (config.github?.enabled && config.github.username) {
-        const wrap = document.createElement('div');
-        wrap.className = 'integration-card github-card';
-        wrap.innerHTML = `
-            <div class="github-header">
-                <i class="fab fa-github"></i> GitHub Overview
-            </div>
-            <img class="github-chart" src="" alt="${config.github.username}'s Github stats" style="max-width: 100%; object-fit: contain; margin: 0 auto; display: block;" />
-        `;
-        grid.appendChild(wrap);
-        
         // Fix up the color variable replacement
         const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim();
         let hexColor = '8b5cf6';
         if (primaryColor.startsWith('#')) {
             hexColor = primaryColor.replace('#', '');
         } else if (primaryColor.startsWith('rgb')) {
-            // Very naive rgb to hex, fallback to purple
             hexColor = '8b5cf6'; 
         }
-        
-        const img = wrap.querySelector('.github-chart');
-        img.src = `https://github-readme-stats.vercel.app/api?username=${config.github.username}&title_color=${hexColor}&icon_color=${hexColor}&text_color=ffffff&bg_color=00000000&hide_border=true&show_icons=true`;
+
+        const wrap = document.createElement('div');
+        wrap.className = 'integration-card github-card floating-github';
+        wrap.innerHTML = `
+            <div class="github-header">
+                <i class="fab fa-github"></i> GitHub Contributions
+            </div>
+            <img class="github-chart" src="https://ghchart.rshah.org/${hexColor}/${config.github.username}" alt="${config.github.username}'s Github chart" />
+        `;
+        grid.appendChild(wrap);
     }
 });
