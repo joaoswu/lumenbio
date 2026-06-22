@@ -305,6 +305,10 @@ class GuestbookWidget {
 
 // Automatically mount when bio is ready
 document.addEventListener('DOMContentLoaded', () => {
+    // Do not mount guestbook in dashboard live preview
+    if (new URLSearchParams(window.location.search).has('preview')) {
+        return;
+    }
     // Check if siteConfig is active and guestbook config is passed
     if (window.siteConfig && window.siteConfig.guestbook) {
         // Wait for welcome screen to dismiss if active, matching the nowPlaying pattern
