@@ -112,20 +112,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // GitHub Stats
     if (config.github?.enabled && config.github.username) {
-        // Fix up the color variable replacement
-        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim();
-        let hexColor = '8b5cf6';
-        if (primaryColor.startsWith('#')) {
-            hexColor = primaryColor.replace('#', '');
-        } else if (primaryColor.startsWith('rgb')) {
-            hexColor = '8b5cf6'; 
-        }
-
         const htmlContent = `
             <div class="github-header">
                 <i class="fab fa-github"></i> GitHub Contributions
             </div>
-            <img class="github-chart" src="https://ghchart.rshah.org/${hexColor}/${config.github.username}" alt="${config.github.username}'s Github chart" />
+            <div class="github-chart-container" style="min-height: 100px; display: flex; justify-content: center; align-items: center; width: 100%;">
+                <span style="font-size: 0.8rem; color: #8b949e;">Loading chart...</span>
+            </div>
         `;
 
         // Desktop Floating Version (appended to body to escape CSS stacking context)
@@ -139,5 +132,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         wrapMobile.className = 'integration-card github-card inline-github';
         wrapMobile.innerHTML = htmlContent;
         grid.appendChild(wrapMobile);
+
+        // Fetch SVG directly so we can make true dark mode with explicit green
+        fetch(`https://ghchart.rshah.org/39d353/${config.github.username}`)
+            .then(res => res.text())
+            .then(svg => {
+                // Replace light colors with deep dark mode colors
+                const darkSvg = svg
+                    .replace(/fill="#ebedf0"/g, 'fill="#161b22"') // Empty square background
+                    .replace(/fill="#767676"/g, 'fill="#8b949e"'); // Axis text
+                
+                wrapDesktop.querySelector('.github-chart-container').innerHTML = darkSvg;
+                wrapMobile.querySelector('.github-chart-container').innerHTML = darkSvg;
+            })
+            .catch(err => {
+                const errHtml = '<span style="color: #fca5a5; font-size: 0.8rem;">Failed to load</span>';
+                wrapDesktop.querySelector('.github-chart-container').innerHTML = errHtml;
+                wrapMobile.querySelector('.github-chart-container').innerHTML = errHtml;
+            });
     }
 });

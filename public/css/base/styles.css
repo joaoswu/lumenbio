@@ -741,21 +741,18 @@ body::-webkit-scrollbar {
     color: var(--color-text);
 }
 
-.github-chart {
+.github-chart-container svg {
     width: 100%;
     height: auto;
     border-radius: 4px;
     opacity: 0.9;
-    /* Invert the image to make black text white and gray squares dark, 
-       then hue-rotate to restore the primary color's hue, 
-       then boost brightness so the color pops. */
-    filter: invert(1) hue-rotate(180deg) brightness(1.5) saturate(1.2) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
-    transition: all 0.3s ease;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+    transition: opacity 0.3s ease, filter 0.3s ease;
 }
 
-.github-card:hover .github-chart {
+.github-card:hover .github-chart-container svg {
     opacity: 1;
-    filter: invert(1) hue-rotate(180deg) brightness(1.7) saturate(1.4) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
 }
 
 @media (min-width: 1025px) {
