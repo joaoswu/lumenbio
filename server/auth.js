@@ -17,11 +17,11 @@ const { Redis } = require('@upstash/redis');
 const kv = new Redis({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN });
 const router = express.Router();
 
-const signupLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10, message: 'Too many sign-up attempts. Try again later.' });
-const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, message: 'Too many login attempts. Please wait a few minutes.' });
-const redeemLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 15, message: 'Too many code attempts. Try again later.' });
-const forgotLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 8, message: 'Too many reset requests. Try again later.' });
-const resetLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 20, message: 'Too many attempts. Try again later.' });
+const signupLimiter = rateLimit({ name: 'signup', windowMs: 60 * 60 * 1000, max: 10, message: 'Too many sign-up attempts. Try again later.' });
+const loginLimiter = rateLimit({ name: 'login', windowMs: 15 * 60 * 1000, max: 20, message: 'Too many login attempts. Please wait a few minutes.' });
+const redeemLimiter = rateLimit({ name: 'redeem', windowMs: 60 * 60 * 1000, max: 15, message: 'Too many code attempts. Try again later.' });
+const forgotLimiter = rateLimit({ name: 'forgot', windowMs: 60 * 60 * 1000, max: 8, message: 'Too many reset requests. Try again later.' });
+const resetLimiter = rateLimit({ name: 'reset', windowMs: 60 * 60 * 1000, max: 20, message: 'Too many attempts. Try again later.' });
 
 const PASSWORD_TOO_WEAK = 'Password is too weak — use 8+ characters with a mix of letters, numbers and symbols.';
 function passwordOk(pw) {

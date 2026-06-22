@@ -46,6 +46,8 @@ module.exports = {
     const db = await load();
     const entry = db[u] || (db[u] = { days: {}, referrers: {}, clicks: {} });
     if (!entry.clicks) entry.clicks = {};
+    // Only count known labels once we hit the cap, so junk can't bloat the blob.
+    if (entry.clicks[key] === undefined && Object.keys(entry.clicks).length >= 200) return;
     entry.clicks[key] = (entry.clicks[key] || 0) + 1;
     await save(db);
   },

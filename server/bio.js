@@ -9,9 +9,14 @@ const { put } = require('@vercel/blob');
 const store = require('./store');
 const defaultConfig = require('./defaultConfig');
 const analytics = require('./analytics');
+const rateLimit = require('./rateLimit');
 const { authRequired } = require('./auth');
 
 const router = express.Router();
+
+// Generous per-IP cap on the public click beacon — a real visitor won't hit it,
+// but it blunts scripted attempts to inflate counts / hammer the KV store.
+const clickLimiter = rateLimit({ name: 'click', windowMs: 60 * 1000, max: 120, message: 'Slow down.' });
 
 const ALLOWED_AUDIO = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/webm', 'audio/mp4', 'audio/aac', 'audio/flac'];
 
@@ -160,7 +165,7 @@ router.put('/', authRequired, async (req, res) => {
 });
 
 // Public link-click beacon (fired by clickTracker.js on the bio page).
-router.post('/:username/click', async (req, res) => {
+router.post('/:username/click', clickLimiter, async (req, res) => {
   try {
     const u = await store.findByUsername(req.params.username);
     if (u) {
