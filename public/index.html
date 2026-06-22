@@ -82,94 +82,81 @@
                     </div>
                 </div>
 
-                <!-- Sleek Glassmorphic Tab Navigation -->
-                <div class="tab-nav">
-                    <button class="tab-btn active" data-tab="links">
-                        <i class="fas fa-link"></i> Links
-                    </button>
-                    <button class="tab-btn" data-tab="status">
-                        <i class="fas fa-signal"></i> Status
-                    </button>
+                <!-- Divider after profile -->
+                <div class="divider"></div>
+
+                <!-- Social Icons -->
+                <div class="social-grid">
+                    <a href="#" class="social-icon" data-social="github" aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="#" class="social-icon" data-social="twitter" aria-label="Twitter/X">
+                        <i class="fab fa-x-twitter"></i>
+                    </a>
+                    <a href="#" class="social-icon" data-social="lastfm" aria-label="Last.fm">
+                        <i class="fab fa-lastfm"></i>
+                    </a>
+                    <a href="#" class="social-icon" data-social="osu" aria-label="osu!">
+                        <i class="fas fa-circle-dot"></i>
+                    </a>
+                    <a href="#" class="social-icon" data-social="vrchat" aria-label="VRChat">
+                        <i class="fas fa-vr-cardboard"></i>
+                    </a>
+                    <a href="#" class="social-icon" data-social="steam" aria-label="Steam">
+                        <i class="fab fa-steam"></i>
+                    </a>
+                    <a href="#" class="social-icon" data-social="instagram" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-icon" data-social="tiktok" aria-label="TikTok">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                    <a href="#" class="social-icon" data-social="namemc" aria-label="NameMC">
+                        <i class="fas fa-cube"></i>
+                    </a>
+                    <a href="#" class="social-icon" data-social="youtube" aria-label="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
                 </div>
 
-                <!-- Tab Pane 1: Links -->
-                <div class="tab-pane active" id="tab-pane-links">
-                    <!-- Social Icons -->
-                    <div class="social-grid">
-                        <a href="#" class="social-icon" data-social="github" aria-label="GitHub">
-                            <i class="fab fa-github"></i>
-                        </a>
-                        <a href="#" class="social-icon" data-social="twitter" aria-label="Twitter/X">
-                            <i class="fab fa-x-twitter"></i>
-                        </a>
-                        <a href="#" class="social-icon" data-social="lastfm" aria-label="Last.fm">
-                            <i class="fab fa-lastfm"></i>
-                        </a>
-                        <a href="#" class="social-icon" data-social="osu" aria-label="osu!">
-                            <i class="fas fa-circle-dot"></i>
-                        </a>
-                        <a href="#" class="social-icon" data-social="vrchat" aria-label="VRChat">
-                            <i class="fas fa-vr-cardboard"></i>
-                        </a>
-                        <a href="#" class="social-icon" data-social="steam" aria-label="Steam">
-                            <i class="fab fa-steam"></i>
-                        </a>
-                        <a href="#" class="social-icon" data-social="instagram" aria-label="Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="social-icon" data-social="tiktok" aria-label="TikTok">
-                            <i class="fab fa-tiktok"></i>
-                        </a>
-                        <a href="#" class="social-icon" data-social="namemc" aria-label="NameMC">
-                            <i class="fas fa-cube"></i>
-                        </a>
-                        <a href="#" class="social-icon" data-social="youtube" aria-label="YouTube">
-                            <i class="fab fa-youtube"></i>
-                        </a>
+                <!-- Status Panel -->
+                <div class="status-panel glass">
+                    <div class="status-header">
+                        <span class="status-title">System Status</span>
+                        <div class="status-indicator">
+                            <div class="status-dot active" id="discord-status-dot"></div>
+                            <span class="status-text status-online" id="discord-status-text">Loading…</span>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Tab Pane 2: Status -->
-                <div class="tab-pane" id="tab-pane-status">
-                    <!-- Status Panel -->
-                    <div class="status-panel glass">
-                        <div class="status-header">
-                            <span class="status-title">System Status</span>
-                            <div class="status-indicator">
-                                <div class="status-dot active" id="discord-status-dot"></div>
-                                <span class="status-text status-online" id="discord-status-text">Loading…</span>
-                            </div>
+                    <div class="divider-thin"></div>
+
+                    <div class="status-info">
+                        <div class="status-row">
+                            <span class="status-label">Location</span>
+                            <span class="status-value location-text"></span>
                         </div>
-
-                        <div class="divider-thin"></div>
-
-                        <div class="status-info">
-                            <div class="status-row">
-                                <span class="status-label">Location</span>
-                                <span class="status-value location-text"></span>
-                            </div>
-                            <div class="status-row">
-                                <span class="status-label">My Time</span>
-                                <span class="status-value time-value">
-                                    <span id="current-time">--:--:--</span>
-                                    <small class="tz-diff" id="tz-diff"></small>
-                                </span>
-                            </div>
+                        <div class="status-row">
+                            <span class="status-label">My Time</span>
+                            <span class="status-value time-value">
+                                <span id="current-time">--:--:--</span>
+                                <small class="tz-diff" id="tz-diff"></small>
+                            </span>
                         </div>
+                    </div>
 
-                        <!-- Discord rich presence (populated by JS) -->
-                        <div class="discord-activity" id="discord-activity" hidden>
-                            <div class="activity-art-wrap">
-                                <img class="activity-art" id="activity-art" alt="" loading="lazy">
-                                <i class="fas fa-gamepad activity-art-fallback" aria-hidden="true"></i>
-                            </div>
-                            <div class="activity-meta">
-                                <div class="activity-kind" id="activity-kind"></div>
-                                <div class="activity-line1" id="activity-line1"></div>
-                                <div class="activity-line2" id="activity-line2"></div>
-                                <div class="activity-progress" id="activity-progress" hidden>
-                                    <div class="activity-progress-bar" id="activity-progress-bar"></div>
-                                </div>
+                    <!-- Discord rich presence (populated by JS) -->
+                    <div class="discord-activity" id="discord-activity" hidden>
+                        <div class="activity-art-wrap">
+                            <img class="activity-art" id="activity-art" alt="" loading="lazy">
+                            <i class="fas fa-gamepad activity-art-fallback" aria-hidden="true"></i>
+                        </div>
+                        <div class="activity-meta">
+                            <div class="activity-kind" id="activity-kind"></div>
+                            <div class="activity-line1" id="activity-line1"></div>
+                            <div class="activity-line2" id="activity-line2"></div>
+                            <div class="activity-progress" id="activity-progress" hidden>
+                                <div class="activity-progress-bar" id="activity-progress-bar"></div>
                             </div>
                         </div>
                     </div>
@@ -206,7 +193,6 @@
     <script src="js/modules/interactions.js?v=1.1.5"></script>
     <script src="js/modules/viewCounter.js?v=1.1.5"></script>
     <script src="js/modules/guestbook.js?v=1.1.5"></script>
-    <script src="js/modules/tabs.js?v=1.1.5"></script>
     <script src="js/main.js?v=1.1.5"></script>
 </body>
 </html>
