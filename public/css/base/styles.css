@@ -1824,13 +1824,17 @@ body.has-np footer { bottom: 96px; transition: bottom 0.6s var(--ease-out-soft);
 /* Discord Popover Modal System */
 .status-panel {
     cursor: pointer;
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+    border-radius: 12px;
+    /* gentle inset highlight region without shifting layout */
+    padding: 0.5rem 0.65rem;
+    margin: -0.5rem -0.65rem;
+    transition: background-color var(--transition-fast);
 }
 
+/* Seamless hover: a soft tint fades in (background-color animates smoothly,
+   unlike box-shadow from `none`, which snaps). No lift, no layout shift. */
 .status-panel:hover {
-    transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35), var(--glass-highlight);
+    background-color: rgba(255, 255, 255, 0.045);
 }
 
 .discord-popover-overlay {
