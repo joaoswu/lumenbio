@@ -53,6 +53,33 @@
     }
   }
 
+  function isBuymeacoffeeUrl(u) {
+    try {
+      const url = new URL(u);
+      return url.hostname === 'buymeacoffee.com' || url.hostname.endsWith('.buymeacoffee.com');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isKofiUrl(u) {
+    try {
+      const url = new URL(u);
+      return url.hostname === 'ko-fi.com' || url.hostname.endsWith('.ko-fi.com');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isPatreonUrl(u) {
+    try {
+      const url = new URL(u);
+      return url.hostname === 'patreon.com' || url.hostname.endsWith('.patreon.com');
+    } catch (e) {
+      return false;
+    }
+  }
+
   // ---- toast ----
   const toastEl = $('#toast');
   let toastTimer;
@@ -157,6 +184,33 @@
       if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
       if (!isPayhipUrl(val)) {
         toast('Payhip URL must be a valid payhip.com link.', true);
+        return;
+      }
+    }
+    const bmcEl = document.querySelector('[data-path="socialMedia.buymeacoffee"]');
+    if (bmcEl && bmcEl.value.trim()) {
+      let val = bmcEl.value.trim();
+      if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
+      if (!isBuymeacoffeeUrl(val)) {
+        toast('Buy Me a Coffee URL must be a valid buymeacoffee.com link.', true);
+        return;
+      }
+    }
+    const kofiEl = document.querySelector('[data-path="socialMedia.kofi"]');
+    if (kofiEl && kofiEl.value.trim()) {
+      let val = kofiEl.value.trim();
+      if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
+      if (!isKofiUrl(val)) {
+        toast('Ko-fi URL must be a valid ko-fi.com link.', true);
+        return;
+      }
+    }
+    const patreonEl = document.querySelector('[data-path="socialMedia.patreon"]');
+    if (patreonEl && patreonEl.value.trim()) {
+      let val = patreonEl.value.trim();
+      if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
+      if (!isPatreonUrl(val)) {
+        toast('Patreon URL must be a valid patreon.com link.', true);
         return;
       }
     }

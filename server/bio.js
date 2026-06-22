@@ -83,6 +83,33 @@ function isPayhipUrl(u) {
   }
 }
 
+function isBuymeacoffeeUrl(u) {
+  try {
+    const url = new URL(u);
+    return url.hostname === 'buymeacoffee.com' || url.hostname.endsWith('.buymeacoffee.com');
+  } catch (e) {
+    return false;
+  }
+}
+
+function isKofiUrl(u) {
+  try {
+    const url = new URL(u);
+    return url.hostname === 'ko-fi.com' || url.hostname.endsWith('.ko-fi.com');
+  } catch (e) {
+    return false;
+  }
+}
+
+function isPatreonUrl(u) {
+  try {
+    const url = new URL(u);
+    return url.hostname === 'patreon.com' || url.hostname.endsWith('.patreon.com');
+  } catch (e) {
+    return false;
+  }
+}
+
 function publicConfig(config) {
   const c = JSON.parse(JSON.stringify(config || {}));
   const enabled = !!(c.passwordProtect && c.passwordProtect.enabled && c.passwordProtect.hash);
@@ -139,6 +166,12 @@ router.put('/', authRequired, async (req, res) => {
       if (merged.socialMedia[k]) {
         const url = safeUrl(merged.socialMedia[k]);
         if (k === 'payhip' && !isPayhipUrl(url)) {
+          merged.socialMedia[k] = '';
+        } else if (k === 'buymeacoffee' && !isBuymeacoffeeUrl(url)) {
+          merged.socialMedia[k] = '';
+        } else if (k === 'kofi' && !isKofiUrl(url)) {
+          merged.socialMedia[k] = '';
+        } else if (k === 'patreon' && !isPatreonUrl(url)) {
           merged.socialMedia[k] = '';
         } else {
           merged.socialMedia[k] = url;

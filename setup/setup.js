@@ -79,6 +79,33 @@ function isPayhipUrl(u) {
   }
 }
 
+function isBuymeacoffeeUrl(u) {
+  try {
+    const url = new URL(u);
+    return url.hostname === 'buymeacoffee.com' || url.hostname.endsWith('.buymeacoffee.com');
+  } catch (e) {
+    return false;
+  }
+}
+
+function isKofiUrl(u) {
+  try {
+    const url = new URL(u);
+    return url.hostname === 'ko-fi.com' || url.hostname.endsWith('.ko-fi.com');
+  } catch (e) {
+    return false;
+  }
+}
+
+function isPatreonUrl(u) {
+  try {
+    const url = new URL(u);
+    return url.hostname === 'patreon.com' || url.hostname.endsWith('.patreon.com');
+  } catch (e) {
+    return false;
+  }
+}
+
 function validateStep(step) {
   if (step === 1) {
     const name = document.getElementById('name').value.trim();
@@ -93,6 +120,33 @@ function validateStep(step) {
       if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
       if (!isPayhipUrl(val)) {
         alert('Payhip URL must be a valid payhip.com link.');
+        return false;
+      }
+    }
+    const bmcEl = document.querySelector('input[name="buymeacoffee"]');
+    if (bmcEl && bmcEl.value.trim()) {
+      let val = bmcEl.value.trim();
+      if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
+      if (!isBuymeacoffeeUrl(val)) {
+        alert('Buy Me a Coffee URL must be a valid buymeacoffee.com link.');
+        return false;
+      }
+    }
+    const kofiEl = document.querySelector('input[name="kofi"]');
+    if (kofiEl && kofiEl.value.trim()) {
+      let val = kofiEl.value.trim();
+      if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
+      if (!isKofiUrl(val)) {
+        alert('Ko-fi URL must be a valid ko-fi.com link.');
+        return false;
+      }
+    }
+    const patreonEl = document.querySelector('input[name="patreon"]');
+    if (patreonEl && patreonEl.value.trim()) {
+      let val = patreonEl.value.trim();
+      if (!/^https?:\/\//i.test(val)) val = 'https://' + val;
+      if (!isPatreonUrl(val)) {
+        alert('Patreon URL must be a valid patreon.com link.');
         return false;
       }
     }
@@ -184,7 +238,7 @@ setupPreview('bg-file', 'bg-preview', 'bg-icon', 'bg-hint');
 function buildReview() {
   const form = document.getElementById('setup-form');
   const d = formValues(form);
-  const socials = ['github', 'twitter', 'steam', 'vrchat', 'osu', 'instagram', 'tiktok', 'youtube', 'namemc', 'payhip']
+  const socials = ['github', 'twitter', 'steam', 'vrchat', 'osu', 'instagram', 'tiktok', 'youtube', 'namemc', 'payhip', 'buymeacoffee', 'kofi', 'patreon']
     .filter(k => d[k]).join(', ') || 'none';
   const checked = id => document.getElementById(id).checked;
   const songCount = (document.getElementById('songs-file').files || []).length;

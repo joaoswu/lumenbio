@@ -18,7 +18,7 @@ module.exports = function defaultConfig(username, displayName) {
     socialMedia: {
       github: '', twitter: '', lastfm: '', osu: '', vrchat: '',
       steam: '', instagram: '', tiktok: '', namemc: '', youtube: '',
-      payhip: ''
+      payhip: '', buymeacoffee: '', kofi: '', patreon: ''
     },
     locations: { enabled: false, interval: 10000, list: [] },
     lastfm: { enabled: false, username: '', apiKey: '' },
