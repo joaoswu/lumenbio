@@ -151,8 +151,8 @@
     }
 
     function draw() {
+      if (!playing || !analyser) { rafId = null; return; } // stop the loop when paused / no graph
       rafId = requestAnimationFrame(draw);
-      if (!analyser) return;
       analyser.getByteFrequencyData(freq);
       const w = canvas.width, h = canvas.height;
       ctx2d.clearRect(0, 0, w, h);
@@ -171,9 +171,9 @@
     function play() {
       ensureGraph();
       if (actx && actx.state === 'suspended') actx.resume();
-      audio.play().then(() => { playing = true; updateBtn(); if (!rafId) draw(); }).catch(() => {});
+      audio.play().then(() => { playing = true; updateBtn(); if (analyser && !rafId) draw(); }).catch(() => {});
     }
-    function pause() { audio.pause(); playing = false; updateBtn(); }
+    function pause() { audio.pause(); playing = false; updateBtn(); if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
 
     playBtn.addEventListener('click', () => (playing ? pause() : play()));
     prevBtn.addEventListener('click', () => loadTrack(idx - 1, true));

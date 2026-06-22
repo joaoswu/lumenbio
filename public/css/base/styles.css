@@ -105,6 +105,17 @@ body::-webkit-scrollbar {
     100% { transform: translate3d(2%, 2%, 0) scale(1.08); }
 }
 
+/* ---- Lite mode (mobile / low-end / reduced-motion) ----
+   Particles are vetoed in JS (perf.js). Here we trim the glass blur and stop
+   the always-on animations behind the cards so each glass region composites
+   once instead of recompositing every frame — the main source of lag. */
+html.lite { --glass-blur: 6px; }
+html.lite #accent-glow { animation: none; }
+html.lite #particles-js { display: none !important; }
+html.lite #profile-name,
+html.lite .bloom-text,
+html.lite .status-dot { animation: none !important; }
+
 /* 3D tilt layer */
 .tilt-wrap {
     transform-style: preserve-3d;
