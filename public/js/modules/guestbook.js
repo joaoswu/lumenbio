@@ -32,13 +32,12 @@ class GuestbookWidget {
     }
     
     createWidgetMarkup() {
-        // Find main card-stack to append the guestbook card
-        const stack = document.querySelector('.card-stack');
-        if (!stack) return;
+        // Find main page container to append the guestbook next to the main card
+        const page = document.querySelector('.page');
+        if (!page) return;
         
         this.container = document.createElement('div');
-        this.container.className = 'status-panel glass guestbook-widget fade-in';
-        this.container.style.marginTop = '1.3rem';
+        this.container.className = 'guestbook-card glass fade-in';
         
         const anonymousPlaceholder = this.allowAnonymous ? ' (optional)' : '';
         const nameRequiredAttr = this.allowAnonymous ? '' : 'required';
@@ -78,7 +77,7 @@ class GuestbookWidget {
             </form>
         `;
         
-        stack.appendChild(this.container);
+        page.appendChild(this.container);
         
         this.listElement = this.container.querySelector('#gb-list');
         this.formElement = this.container.querySelector('#gb-form');
