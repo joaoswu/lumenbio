@@ -655,6 +655,23 @@
       finally { ceSave.disabled = false; }
     });
 
+    // account: change username
+    const cuSave = document.getElementById('cu-save');
+    if (cuSave) cuSave.addEventListener('click', async () => {
+      const newU = (document.getElementById('cu-username').value || '').trim().toLowerCase();
+      const pass = document.getElementById('cu-pass').value;
+      if (!newU || !pass) return toast('Enter a new username and your password.', true);
+      cuSave.disabled = true;
+      try {
+        const r = await fetch('/api/auth/change-username', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: newU, password: pass }) });
+        const d = await r.json();
+        if (!r.ok || !d.success) throw new Error(d.error || 'Could not change username.');
+        toast('Username updated ✓ Reloading…');
+        setTimeout(() => window.location.reload(), 900);
+      } catch (e) { toast(e.message, true); }
+      finally { cuSave.disabled = false; }
+    });
+
     // account: delete
     const delBtn = document.getElementById('del-acct');
     if (delBtn) delBtn.addEventListener('click', async () => {

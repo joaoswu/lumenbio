@@ -94,6 +94,28 @@ app.get('/signup', sendPage('auth', 'signup.html'));
 app.get('/forgot', sendPage('auth', 'forgot.html'));
 app.get('/reset', sendPage('auth', 'reset.html'));
 app.get('/verify', sendPage('auth', 'verify.html'));
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /dashboard\nDisallow: /admin\nDisallow: /api/\nSitemap: ${originOf(req)}/sitemap.xml\n`);
+});
+
+app.get('/sitemap.xml', async (req, res) => {
+  const origin = originOf(req);
+  const head = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+  try {
+    const users = await store.all();
+    const locs = [`${origin}/`, `${origin}/leaderboard`].concat(
+      users
+        .filter(u => !(u.config && u.config.passwordProtect && u.config.passwordProtect.enabled)) // skip private pages
+        .map(u => `${origin}/u/${u.username}`)
+    );
+    const body = head + locs.map(l => `  <url><loc>${escapeAttr(l)}</loc></url>`).join('\n') + '\n</urlset>\n';
+    res.type('application/xml').set('Cache-Control', 'public, max-age=3600').send(body);
+  } catch (e) {
+    console.error('Sitemap error:', e);
+    res.type('application/xml').send(head + '</urlset>\n');
+  }
+});
 app.get('/dashboard', sendPage('dashboard'));
 app.get('/leaderboard', sendPage('leaderboard'));
 app.get('/admin', sendPage('admin'));

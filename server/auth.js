@@ -23,6 +23,7 @@ const redeemLimiter = rateLimit({ name: 'redeem', windowMs: 60 * 60 * 1000, max:
 const forgotLimiter = rateLimit({ name: 'forgot', windowMs: 60 * 60 * 1000, max: 8, message: 'Too many reset requests. Try again later.' });
 const resetLimiter = rateLimit({ name: 'reset', windowMs: 60 * 60 * 1000, max: 20, message: 'Too many attempts. Try again later.' });
 const resendLimiter = rateLimit({ name: 'resend', windowMs: 60 * 60 * 1000, max: 8, message: 'Too many requests. Try again later.' });
+const usernameLimiter = rateLimit({ name: 'username', windowMs: 24 * 60 * 60 * 1000, max: 5, message: 'Too many username changes. Try again tomorrow.' });
 
 async function sendVerification(req, user) {
   const token = crypto.randomBytes(32).toString('hex');
@@ -253,6 +254,25 @@ router.post('/change-password', authRequired, async (req, res) => {
   if (!passwordOk(next)) return res.status(400).json({ error: PASSWORD_TOO_WEAK });
   await store.update(u.id, { passwordHash: await bcrypt.hash(next, 10) });
   res.json({ success: true });
+});
+
+router.post('/change-username', usernameLimiter, authRequired, async (req, res) => {
+  const u = await store.findById(req.user.id);
+  if (!u) return res.status(404).json({ error: 'User not found' });
+  const username = String(req.body.username || '').trim().toLowerCase();
+  const password = String(req.body.password || '');
+  if (!USERNAME_RE.test(username)) {
+    return res.status(400).json({ error: 'Username must be 3–20 characters: lowercase letters, numbers or underscore.' });
+  }
+  if (RESERVED.includes(username)) return res.status(400).json({ error: 'That username is reserved.' });
+  if (!(await bcrypt.compare(password, u.passwordHash))) {
+    return res.status(400).json({ error: 'Password is incorrect.' });
+  }
+  if (username === u.username) return res.json({ success: true, username });
+  if (await store.findByUsername(username)) return res.status(409).json({ error: 'That username is already taken.' });
+  await store.update(u.id, { username });
+  setAuthCookie(res, await sign({ id: u.id, username })); // refresh token with the new handle
+  res.json({ success: true, username });
 });
 
 router.post('/change-email', authRequired, async (req, res) => {

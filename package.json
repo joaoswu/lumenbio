@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "test": "node --test",
     "config": "node scripts/generateConfig.js",
     "serve": "npx live-server public --port=3000 --open=/index.html",
     "release": "node scripts/release.js"
