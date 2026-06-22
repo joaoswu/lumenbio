@@ -77,6 +77,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
 
             renderDiscordActivity(userData);
+            
+            if (window.discordPopover) {
+                window.discordPopover.update(userData);
+            }
         };
     } else {
 
