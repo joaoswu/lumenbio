@@ -110,15 +110,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // GitHub Graph
+    // GitHub Stats
     if (config.github?.enabled && config.github.username) {
         const wrap = document.createElement('div');
         wrap.className = 'integration-card github-card';
         wrap.innerHTML = `
             <div class="github-header">
-                <i class="fab fa-github"></i> GitHub Contributions
+                <i class="fab fa-github"></i> GitHub Overview
             </div>
-            <img class="github-chart" src="https://ghchart.rshah.org/var(--color-primary-hex)/${config.github.username}" alt="${config.github.username}'s Github chart" />
+            <img class="github-chart" src="" alt="${config.github.username}'s Github stats" style="max-width: 100%; object-fit: contain; margin: 0 auto; display: block;" />
         `;
         grid.appendChild(wrap);
         
@@ -133,6 +133,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         const img = wrap.querySelector('.github-chart');
-        img.src = `https://ghchart.rshah.org/${hexColor}/${config.github.username}`;
+        img.src = `https://github-readme-stats.vercel.app/api?username=${config.github.username}&title_color=${hexColor}&icon_color=${hexColor}&text_color=ffffff&bg_color=00000000&hide_border=true&show_icons=true`;
     }
 });
