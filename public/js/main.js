@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
+    if (new URLSearchParams(window.location.search).has('preview')) {
+        document.body.classList.add('is-preview');
+    }
     TimeUtils.initTimeDisplay(window.siteConfig);
     loadFooterConfig();
 }

@@ -2083,4 +2083,30 @@ body.has-np footer { bottom: 96px; transition: bottom 0.6s var(--ease-out-soft);
     font-style: italic;
 }
 
+/* Dashboard live preview specific overrides */
+body.is-preview {
+    overflow-y: auto !important;
+}
+
+body.is-preview::-webkit-scrollbar {
+    display: block !important;
+    width: 6px;
+}
+
+body.is-preview::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border-radius: 3px !important;
+}
+
+body.is-preview .page,
+body.is-preview footer,
+body.is-preview .lumen-credit {
+    zoom: 0.75;
+}
+
+body.is-preview .page {
+    padding: 1rem 0.5rem;
+}
+
+
 
