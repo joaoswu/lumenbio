@@ -28,7 +28,7 @@ const CSP = [
   "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
   "img-src 'self' data: blob: https:",
   "media-src 'self' blob: https:",
-  "connect-src 'self' https://api.lanyard.rest wss://api.lanyard.rest https://ws.audioscrobbler.com https://geocoding-api.open-meteo.com https://api.open-meteo.com https://decapi.me",
+  "connect-src 'self' https://api.lanyard.rest wss://api.lanyard.rest https://ws.audioscrobbler.com https://geocoding-api.open-meteo.com https://api.open-meteo.com https://decapi.me https://api.github.com",
   "frame-ancestors 'self'",
   "base-uri 'self'",
   "form-action 'self'",

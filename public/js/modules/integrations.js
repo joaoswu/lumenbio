@@ -110,45 +110,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // GitHub Stats
+    // Premium GitHub Card
     if (config.github?.enabled && config.github.username) {
-        const htmlContent = `
-            <div class="github-header">
-                <i class="fab fa-github"></i> GitHub Contributions
-            </div>
-            <div class="github-chart-container" style="min-height: 100px; display: flex; justify-content: center; align-items: center; width: 100%;">
-                <span style="font-size: 0.8rem; color: #8b949e;">Loading chart...</span>
-            </div>
-        `;
-
-        // Desktop Floating Version (appended to body to escape CSS stacking context)
         const wrapDesktop = document.createElement('div');
         wrapDesktop.className = 'integration-card github-card floating-github';
-        wrapDesktop.innerHTML = htmlContent;
         document.body.appendChild(wrapDesktop);
 
-        // Mobile Inline Version (appended to normal grid)
         const wrapMobile = document.createElement('div');
         wrapMobile.className = 'integration-card github-card inline-github';
-        wrapMobile.innerHTML = htmlContent;
         grid.appendChild(wrapMobile);
 
-        // Fetch SVG directly so we can make true dark mode with explicit green
-        fetch(`https://ghchart.rshah.org/39d353/${config.github.username}`)
-            .then(res => res.text())
-            .then(svg => {
-                // Replace light colors with deep dark mode colors
-                const darkSvg = svg
-                    .replace(/fill="#ebedf0"/g, 'fill="#161b22"') // Empty square background
-                    .replace(/fill="#767676"/g, 'fill="#8b949e"'); // Axis text
+        const renderGh = (html) => {
+            wrapDesktop.innerHTML = html;
+            wrapMobile.innerHTML = html;
+        };
+
+        renderGh(`
+            <div class="github-header">
+                <i class="fab fa-github"></i> GitHub Profile
+            </div>
+            <div style="padding: 1rem; text-align: center; color: #8b949e;">Loading profile...</div>
+        `);
+
+        fetch(`https://api.github.com/users/${config.github.username}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Not found');
+                return res.json();
+            })
+            .then(data => {
+                const name = data.name || data.login;
+                const bio = data.bio ? `<div class="gh-bio">${data.bio}</div>` : '';
                 
-                wrapDesktop.querySelector('.github-chart-container').innerHTML = darkSvg;
-                wrapMobile.querySelector('.github-chart-container').innerHTML = darkSvg;
+                const html = `
+                    <div class="gh-profile-card">
+                        <div class="gh-top">
+                            <img src="${data.avatar_url}" class="gh-avatar" alt="avatar">
+                            <div class="gh-info">
+                                <div class="gh-name">${name}</div>
+                                <div class="gh-user">@${data.login}</div>
+                            </div>
+                            <a href="${data.html_url}" target="_blank" class="gh-follow-btn">View</a>
+                        </div>
+                        ${bio}
+                        <div class="gh-stats">
+                            <div class="gh-stat">
+                                <span class="gh-stat-value">${data.public_repos}</span>
+                                <span class="gh-stat-label">Repos</span>
+                            </div>
+                            <div class="gh-stat">
+                                <span class="gh-stat-value">${data.followers}</span>
+                                <span class="gh-stat-label">Followers</span>
+                            </div>
+                            <div class="gh-stat">
+                                <span class="gh-stat-value">${data.following}</span>
+                                <span class="gh-stat-label">Following</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                renderGh(html);
             })
             .catch(err => {
-                const errHtml = '<span style="color: #fca5a5; font-size: 0.8rem;">Failed to load</span>';
-                wrapDesktop.querySelector('.github-chart-container').innerHTML = errHtml;
-                wrapMobile.querySelector('.github-chart-container').innerHTML = errHtml;
+                renderGh(`
+                    <div class="github-header">
+                        <i class="fab fa-github"></i> GitHub Profile
+                    </div>
+                    <div style="padding: 1rem; text-align: center; color: #fca5a5;">Failed to load</div>
+                `);
             });
     }
 });
