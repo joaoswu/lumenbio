@@ -133,16 +133,6 @@ body::-webkit-scrollbar {
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-@media (max-width: 800px) {
-    .page {
-        flex-direction: column;
-        gap: 1.5rem;
-        padding-bottom: 5rem;
-    }
 }
 
 .card-stack {
@@ -1531,28 +1521,30 @@ body.has-np footer { bottom: 96px; transition: bottom 0.6s var(--ease-out-soft);
    Guestbook Widget Styling
    ============================================================ */
 .guestbook-card {
-    width: 100%;
-    max-width: 384px;
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 1.3rem;
-    padding: 32px 28px 26px;
-    border-radius: 24px;
+    gap: 1.1rem;
+    padding: 24px 20px;
+    border-radius: 20px;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow), var(--glass-highlight);
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
     backdrop-filter: blur(var(--glass-blur)) saturate(140%);
-    position: relative;
-    transition: box-shadow var(--transition-base);
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 320px;
+    z-index: 50;
+    transition: box-shadow var(--transition-base), transform var(--transition-base);
 }
 
 .guestbook-card::before {
     content: '';
     position: absolute;
     inset: -2px;
-    border-radius: 26px;
+    border-radius: 22px;
     z-index: -1;
     background: conic-gradient(from 0deg,
         transparent 0%,
@@ -1569,6 +1561,19 @@ body.has-np footer { bottom: 96px; transition: bottom 0.6s var(--ease-out-soft);
 
 .guestbook-card:hover {
     box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px color-mix(in srgb, var(--color-primary) 22%, transparent), var(--glass-highlight);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+    .guestbook-card {
+        position: static;
+        width: 100%;
+        max-width: 384px;
+        margin: 1.5rem auto 0;
+        padding: 32px 28px 26px;
+        border-radius: 24px;
+        transform: none !important;
+    }
 }
 
 .guestbook-list {
