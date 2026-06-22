@@ -47,6 +47,7 @@ module.exports = function defaultConfig(username, displayName) {
         locationRotation: { interval: 10000, fadeTransition: true, fadeTime: 10 }
       }
     },
+    guestbook: { enabled: false, allowAnonymous: true },
     welcomeScreen: { enabled: true, text: 'Welcome 👋' },
     font: { family: 'Poppins', weights: '300;400;500;600;700' },
     footer: { text: `${name} · made with Lumenbio` }

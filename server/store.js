@@ -82,5 +82,43 @@ module.exports = {
     u.views = (u.views || 0) + 1;
     await save(db);
     return u.views;
+  },
+  async getGuestbookMessages(username) {
+    try {
+      const messages = await kv.get(`guestbook:${lc(username)}`);
+      return messages || [];
+    } catch (e) {
+      console.error('KV getGuestbookMessages error:', e);
+      return [];
+    }
+  },
+  async addGuestbookMessage(username, msg) {
+    try {
+      const key = `guestbook:${lc(username)}`;
+      const messages = (await kv.get(key)) || [];
+      messages.unshift(msg);
+      if (messages.length > 100) {
+        messages.splice(100);
+      }
+      await kv.set(key, messages);
+      return messages;
+    } catch (e) {
+      console.error('KV addGuestbookMessage error:', e);
+      return [];
+    }
+  },
+  async deleteGuestbookMessage(username, id) {
+    try {
+      const key = `guestbook:${lc(username)}`;
+      const messages = (await kv.get(key)) || [];
+      const i = messages.findIndex(m => m.id === id);
+      if (i === -1) return false;
+      messages.splice(i, 1);
+      await kv.set(key, messages);
+      return true;
+    } catch (e) {
+      console.error('KV deleteGuestbookMessage error:', e);
+      return false;
+    }
   }
 };

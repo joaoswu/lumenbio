@@ -301,6 +301,76 @@
       .catch(() => {});
   }
 
+  async function loadDashboardGuestbook() {
+    const list = document.getElementById('db-guestbook-messages');
+    if (!list) return;
+    list.innerHTML = '<li class="an-empty"><i class="fas fa-spinner fa-spin"></i> Loading messages...</li>';
+    
+    try {
+      const res = await fetch(`/api/bio/${username}/guestbook`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      
+      if (data.success && data.messages) {
+        renderDashboardMessages(data.messages);
+      } else {
+        list.innerHTML = '<li class="an-empty">No messages yet</li>';
+      }
+    } catch (e) {
+      list.innerHTML = '<li class="an-empty">Failed to load messages</li>';
+    }
+  }
+
+  function renderDashboardMessages(messages) {
+    const list = document.getElementById('db-guestbook-messages');
+    if (!list) return;
+    if (messages.length === 0) {
+      list.innerHTML = '<li class="an-empty">No messages yet</li>';
+      return;
+    }
+    
+    list.innerHTML = messages.map(msg => {
+      const date = new Date(msg.timestamp).toLocaleString();
+      return `
+        <li class="gb-message-admin" data-id="${msg.id}">
+          <div class="gb-message-admin-meta">
+            <span class="gb-message-admin-author">${escHtml(msg.name)}</span>
+            <span class="gb-message-admin-text">${escHtml(msg.message)}</span>
+            <span class="gb-message-admin-time">${date}</span>
+          </div>
+          <button type="button" class="gb-del-btn" title="Delete message"><i class="fas fa-trash"></i></button>
+        </li>
+      `;
+    }).join('');
+    
+    list.querySelectorAll('.gb-del-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const li = e.currentTarget.closest('.gb-message-admin');
+        const id = li.dataset.id;
+        if (!confirm('Are you sure you want to delete this guestbook message?')) return;
+        
+        try {
+          const res = await fetch(`/api/bio/${username}/guestbook/${id}`, {
+            method: 'DELETE'
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            li.remove();
+            toast('Message deleted ✓');
+            if (list.children.length === 0) {
+              list.innerHTML = '<li class="an-empty">No messages yet</li>';
+            }
+            reloadPreview();
+          } else {
+            toast(data.error || 'Failed to delete message', true);
+          }
+        } catch (err) {
+          toast('Failed to delete message', true);
+        }
+      });
+    });
+  }
+
   function startCheckout() {
     fetch('/api/billing/checkout', { method: 'POST' })
       .then(r => r.json())
@@ -546,6 +616,7 @@
         document.querySelectorAll('.rail-tab').forEach(t => t.classList.toggle('active', t === tab));
         panels.forEach(p => { p.hidden = (p.dataset.panel !== name); });
         if (name === 'settings' && !accountLoaded) loadAccount();
+        if (name === 'guestbook') loadDashboardGuestbook();
       });
     }
 

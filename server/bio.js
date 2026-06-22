@@ -17,6 +17,7 @@ const router = express.Router();
 // Generous per-IP cap on the public click beacon — a real visitor won't hit it,
 // but it blunts scripted attempts to inflate counts / hammer the KV store.
 const clickLimiter = rateLimit({ name: 'click', windowMs: 60 * 1000, max: 120, message: 'Slow down.' });
+const guestbookLimiter = rateLimit({ name: 'guestbook', windowMs: 60 * 1000, max: 5, message: 'Spam protection: please wait a minute before posting again.' });
 
 const ALLOWED_AUDIO = ['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/webm', 'audio/mp4', 'audio/aac', 'audio/flac'];
 
@@ -223,6 +224,95 @@ router.get('/leaderboard', async (req, res) => {
   } catch (e) {
     console.error('Leaderboard fetch error:', e);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
+router.get('/:username/guestbook', async (req, res) => {
+  try {
+    const user = await store.findByUsername(req.params.username);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const isGuestbookEnabled = !!(user.config && user.config.guestbook && user.config.guestbook.enabled);
+    if (!isGuestbookEnabled) {
+      return res.status(400).json({ error: 'Guestbook is not enabled on this profile.' });
+    }
+    const messages = await store.getGuestbookMessages(user.username);
+    res.json({ success: true, messages });
+  } catch (e) {
+    console.error('Guestbook fetch error:', e);
+    res.status(500).json({ error: 'Failed to fetch guestbook messages' });
+  }
+});
+
+router.post('/:username/guestbook', guestbookLimiter, async (req, res) => {
+  try {
+    const user = await store.findByUsername(req.params.username);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    const gbConfig = (user.config && user.config.guestbook) || {};
+    if (!gbConfig.enabled) {
+      return res.status(400).json({ error: 'Guestbook is not enabled on this profile.' });
+    }
+
+    let name = String(req.body.name || '').trim();
+    const message = String(req.body.message || '').trim();
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message cannot be empty.' });
+    }
+    if (message.length > 500) {
+      return res.status(400).json({ error: 'Message cannot exceed 500 characters.' });
+    }
+
+    if (!name) {
+      if (!gbConfig.allowAnonymous) {
+        return res.status(400).json({ error: 'Anonymous messages are not allowed on this guestbook.' });
+      }
+      name = 'Anonymous';
+    } else if (name.length > 30) {
+      return res.status(400).json({ error: 'Name cannot exceed 30 characters.' });
+    }
+
+    const cleanName = name.replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const cleanMessage = message.replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    const msgId = Math.random().toString(36).substring(2, 11);
+    
+    const msg = {
+      id: msgId,
+      name: cleanName,
+      message: cleanMessage,
+      timestamp: new Date().toISOString()
+    };
+
+    const messages = await store.addGuestbookMessage(user.username, msg);
+    res.json({ success: true, messages });
+  } catch (e) {
+    console.error('Guestbook post error:', e);
+    res.status(500).json({ error: 'Failed to post guestbook message' });
+  }
+});
+
+router.delete('/:username/guestbook/:id', authRequired, async (req, res) => {
+  try {
+    const user = await store.findByUsername(req.params.username);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    if (user.id !== req.user.id) {
+      return res.status(403).json({ error: 'Unauthorized: You do not own this profile.' });
+    }
+
+    const id = req.params.id;
+    const ok = await store.deleteGuestbookMessage(user.username, id);
+    if (!ok) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+    
+    res.json({ success: true });
+  } catch (e) {
+    console.error('Guestbook delete error:', e);
+    res.status(500).json({ error: 'Failed to delete guestbook message' });
   }
 });
 

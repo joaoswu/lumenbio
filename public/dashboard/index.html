@@ -71,6 +71,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="8" cy="17" r="2.2" fill="currentColor" stroke="none"/></svg>
           <span>Extras</span>
         </button>
+        <button class="rail-tab" data-tab="guestbook">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Guestbook</span>
+        </button>
         <span class="rail-spacer"></span>
         <button class="rail-tab rail-settings" data-tab="settings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1M18.7 18.7l-2.1-2.1M7.4 7.4L5.3 5.3"/></svg>
@@ -324,6 +328,19 @@
               <button type="button" class="btn btn-primary js-upgrade"><i class="fas fa-crown"></i> Unlock Premium</button>
             </div>
           </div>
+        </section>
+
+        <section class="tab-panel" data-panel="guestbook" hidden>
+          <h2><i class="fas fa-book-open"></i> Guestbook</h2>
+          <div class="toggle"><div class="tlabel">Enable guestbook<small>Add a guestbook widget to your page</small></div>
+            <label class="switch"><input type="checkbox" data-path="guestbook.enabled"><span class="slider"></span></label></div>
+          <div class="toggle"><div class="tlabel">Allow anonymous posts<small>Let visitors post without providing a name</small></div>
+            <label class="switch"><input type="checkbox" data-path="guestbook.allowAnonymous"><span class="slider"></span></label></div>
+          
+          <h3 class="sub-h2" style="margin-top: 1.5rem; margin-bottom: 0.5rem;"><i class="fas fa-comments"></i> Manage Messages</h3>
+          <ul class="guestbook-list-admin" id="db-guestbook-messages">
+            <li class="an-empty">No messages yet</li>
+          </ul>
         </section>
 
         <!-- SETTINGS (not part of saved config) -->

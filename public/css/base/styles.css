@@ -1516,3 +1516,223 @@ body.has-np footer { bottom: 96px; transition: bottom 0.6s var(--ease-out-soft);
     .discord-badge::after,
     .profile-badge::after { display: none; }
 }
+
+/* ============================================================
+   Guestbook Widget Styling
+   ============================================================ */
+.guestbook-widget {
+    text-align: left;
+}
+
+.guestbook-list {
+    max-height: 220px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-right: 4px;
+    margin: 0.5rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.guestbook-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.guestbook-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.gb-empty {
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+    padding: 1.5rem 0;
+    font-style: italic;
+}
+
+.gb-message-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 0.65rem 0.8rem;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.gb-message-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.gb-message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.gb-message-author {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.gb-message-time {
+    font-size: 0.62rem;
+    color: var(--color-text-muted);
+}
+
+.gb-message-text {
+    font-size: 0.76rem;
+    color: var(--color-text-secondary);
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.gb-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.gb-form input,
+.gb-form textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: 0.78rem;
+    padding: 0.5rem 0.75rem;
+    outline: none;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.gb-form textarea {
+    resize: none;
+}
+
+.gb-form input:focus,
+.gb-form textarea:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.gb-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.gb-msg-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.gb-char-count {
+    font-size: 0.62rem;
+    color: var(--color-text-muted);
+}
+
+.gb-error {
+    font-size: 0.68rem;
+    margin-top: 1px;
+}
+
+.gb-submit-btn {
+    background: var(--color-primary);
+    color: var(--color-background);
+    border: none;
+    border-radius: 8px;
+    padding: 0.45rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.gb-submit-btn:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+.gb-submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Dashboard-specific Guestbook styles */
+.guestbook-list-admin {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.gb-message-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    gap: 1rem;
+}
+
+.gb-message-admin-meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.gb-message-admin-author {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.gb-message-admin-text {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    word-break: break-word;
+    margin-top: 0.2rem;
+}
+
+.gb-message-admin-time {
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
+    margin-top: 0.15rem;
+}
+
+.gb-del-btn {
+    background: transparent;
+    border: none;
+    color: #f87171;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.gb-del-btn:hover {
+    background: rgba(248, 113, 113, 0.1);
+    color: #fca5a5;
+}
