@@ -22,6 +22,15 @@ const loginLimiter = rateLimit({ name: 'login', windowMs: 15 * 60 * 1000, max: 2
 const redeemLimiter = rateLimit({ name: 'redeem', windowMs: 60 * 60 * 1000, max: 15, message: 'Too many code attempts. Try again later.' });
 const forgotLimiter = rateLimit({ name: 'forgot', windowMs: 60 * 60 * 1000, max: 8, message: 'Too many reset requests. Try again later.' });
 const resetLimiter = rateLimit({ name: 'reset', windowMs: 60 * 60 * 1000, max: 20, message: 'Too many attempts. Try again later.' });
+const resendLimiter = rateLimit({ name: 'resend', windowMs: 60 * 60 * 1000, max: 8, message: 'Too many requests. Try again later.' });
+
+async function sendVerification(req, user) {
+  const token = crypto.randomBytes(32).toString('hex');
+  await kv.set('verify:' + token, user.id, { ex: 86400 }); // 24h
+  const link = `${originOf(req)}/verify?token=${token}`;
+  const msg = mailer.verifyEmail(link);
+  await mailer.send({ to: user.email, subject: msg.subject, html: msg.html, text: msg.text });
+}
 
 const PASSWORD_TOO_WEAK = 'Password is too weak — use 8+ characters with a mix of letters, numbers and symbols.';
 function passwordOk(pw) {
@@ -113,8 +122,11 @@ router.post('/signup', signupLimiter, async (req, res) => {
       createdAt: new Date().toISOString(),
       views: 0,
       premium: false,
+      emailVerified: false,
       config: defaultConfig(username)
     });
+
+    try { await sendVerification(req, user); } catch (e) { console.error('Verification email error:', e); }
 
     setAuthCookie(res, await sign(user));
     res.json({ success: true, username: user.username });
@@ -158,6 +170,7 @@ router.get('/account', authRequired, async (req, res) => {
     createdAt: u.createdAt,
     views: u.views || 0,
     premium: !!u.premium,
+    emailVerified: u.emailVerified !== false,
     token: (req.cookies && req.cookies[COOKIE]) || ''
   });
 });
@@ -200,6 +213,32 @@ router.post('/reset', resetLimiter, async (req, res) => {
     console.error('Reset-password error:', e);
     res.status(500).json({ error: 'Something went wrong resetting your password.' });
   }
+});
+
+// ---- Email verification ----
+router.post('/verify', async (req, res) => {
+  const token = String(req.body.token || '').trim();
+  if (!token) return res.status(400).json({ error: 'This verification link is invalid or has expired.' });
+  try {
+    const userId = await kv.get('verify:' + token);
+    if (!userId) return res.status(400).json({ error: 'This verification link is invalid or has expired.' });
+    const user = await store.findById(String(userId));
+    if (!user) return res.status(400).json({ error: 'This verification link is invalid or has expired.' });
+    await store.update(user.id, { emailVerified: true });
+    await kv.del('verify:' + token);
+    res.json({ success: true });
+  } catch (e) {
+    console.error('Verify error:', e);
+    res.status(500).json({ error: 'Something went wrong verifying your email.' });
+  }
+});
+
+router.post('/resend-verification', resendLimiter, authRequired, async (req, res) => {
+  const u = await store.findById(req.user.id);
+  if (!u) return res.status(404).json({ error: 'User not found' });
+  if (u.emailVerified === true) return res.json({ success: true, already: true });
+  try { await sendVerification(req, u); } catch (e) { console.error('Resend verification error:', e); }
+  res.json({ success: true });
 });
 
 // ---- Account management (signed-in) ----
@@ -260,7 +299,7 @@ router.get('/me', authOptional, async (req, res) => {
   const u = await store.findById(req.user.id);
   if (!u) return res.json({ user: null, remaining: await store.remaining() });
   res.json({
-    user: { username: u.username, email: u.email, views: u.views || 0, premium: !!u.premium, isAdmin: await store.isAdmin(u) },
+    user: { username: u.username, email: u.email, views: u.views || 0, premium: !!u.premium, isAdmin: await store.isAdmin(u), emailVerified: u.emailVerified !== false },
     remaining: await store.remaining()
   });
 });

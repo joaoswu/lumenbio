@@ -93,6 +93,7 @@ app.get('/login', sendPage('auth', 'login.html'));
 app.get('/signup', sendPage('auth', 'signup.html'));
 app.get('/forgot', sendPage('auth', 'forgot.html'));
 app.get('/reset', sendPage('auth', 'reset.html'));
+app.get('/verify', sendPage('auth', 'verify.html'));
 app.get('/dashboard', sendPage('dashboard'));
 app.get('/leaderboard', sendPage('leaderboard'));
 app.get('/admin', sendPage('admin'));

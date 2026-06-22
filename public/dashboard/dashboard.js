@@ -103,6 +103,8 @@
     const me = await fetch('/api/auth/me').then(r => r.json()).catch(() => ({}));
     if (!me.user) { window.location.href = '/login'; return; }
     if (me.user.isAdmin) { const al = document.getElementById('admin-link'); if (al) al.hidden = false; }
+    const vb = document.getElementById('verify-banner');
+    if (vb && me.user.emailVerified === false) vb.hidden = false;
 
     const data = await fetch('/api/bio').then(r => r.json()).catch(() => null);
     if (!data || !data.config) { toast('Could not load your config.', true); return; }
@@ -421,6 +423,19 @@
     // QR download
     const qrDl = document.getElementById('qr-download');
     if (qrDl) qrDl.addEventListener('click', downloadQr);
+
+    // resend verification email
+    const vResend = document.getElementById('verify-resend');
+    if (vResend) vResend.addEventListener('click', async () => {
+      vResend.disabled = true;
+      try {
+        const r = await fetch('/api/auth/resend-verification', { method: 'POST' });
+        const d = await r.json();
+        if (!r.ok || !d.success) throw new Error(d.error || 'Could not send email.');
+        toast(d.already ? 'Your email is already verified ✓' : 'Verification email sent — check your inbox.');
+      } catch (e) { toast(e.message, true); }
+      finally { vResend.disabled = false; }
+    });
 
     // account: change password
     const cpSave = document.getElementById('cp-save');

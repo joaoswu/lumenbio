@@ -173,6 +173,28 @@
     });
   }
 
+  // ---- Email verification ----
+  const verifyStatus = document.getElementById('verify-status');
+  if (verifyStatus) {
+    const token = new URLSearchParams(location.search).get('token') || '';
+    (async () => {
+      if (!token) { verifyStatus.hidden = true; return showError('This verification link is invalid or has expired.'); }
+      try {
+        const r = await fetch('/api/auth/verify', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token })
+        });
+        const d = await r.json();
+        if (!r.ok || !d.success) throw new Error(d.error || 'Verification failed.');
+        verifyStatus.hidden = true;
+        showOk('Email verified ✓ Your account is all set.');
+      } catch (e) {
+        verifyStatus.hidden = true;
+        showError(e.message);
+      }
+    })();
+  }
+
   // Capacity note on signup
   const capNote = document.getElementById('cap-note');
   if (capNote) {
