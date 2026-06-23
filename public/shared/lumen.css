@@ -26,6 +26,19 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Keyboard focus — visible accent ring. Uses :focus-visible so mouse/touch
+   users see no change; only keyboard navigation reveals the ring. (a11y §1) */
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible,
+input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* Remove the 300ms tap delay on touch devices for snappier interactions. (§2) */
+a, button, [role="button"], .btn, label, summary { touch-action: manipulation; }
+/* Branded text selection */
+::selection { background: color-mix(in srgb, var(--accent) 42%, transparent); color: #fff; }
 
 body {
     font-family: var(--font);

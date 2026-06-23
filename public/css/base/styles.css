@@ -122,6 +122,17 @@ html.lite .status-dot { animation: none !important; }
 html.potato { --glass-blur: 0px; }
 html.potato #background-overlay { filter: none !important; }
 
+/* Keyboard focus ring, branded selection & snappier taps (a11y §1, interaction §2).
+   :focus-visible means mouse/touch visitors see no change — keyboard only. */
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible,
+input:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--color-primary, #c4313a);
+  outline-offset: 2px;
+}
+a, button, [role="button"], label { touch-action: manipulation; }
+::selection { background: color-mix(in srgb, var(--color-primary, #c4313a) 42%, transparent); color: #fff; }
+
 /* 3D tilt layer */
 .tilt-wrap {
     transform-style: preserve-3d;
