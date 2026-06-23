@@ -23,12 +23,12 @@ app.use(compression());
 // ---- Security headers ----
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' https://cdnjs.cloudflare.com",
+  "script-src 'self' https://cdnjs.cloudflare.com https://va.vercel-scripts.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
   "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
   "img-src 'self' data: blob: https:",
   "media-src 'self' blob: https:",
-  "connect-src 'self' https://api.lanyard.rest wss://api.lanyard.rest https://ws.audioscrobbler.com https://geocoding-api.open-meteo.com https://api.open-meteo.com https://decapi.me https://api.github.com",
+  "connect-src 'self' https://api.lanyard.rest wss://api.lanyard.rest https://ws.audioscrobbler.com https://geocoding-api.open-meteo.com https://api.open-meteo.com https://decapi.me https://api.github.com https://va.vercel-scripts.com",
   "frame-ancestors 'self'",
   "base-uri 'self'",
   "form-action 'self'",
