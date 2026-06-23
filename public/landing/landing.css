@@ -399,3 +399,80 @@
     .capacity { margin-inline: auto; }
     .mock-chip-1 { left: 0; } .mock-chip-2 { right: 0; }
 }
+
+/* ============================================================
+   Landing glow-up
+   ============================================================ */
+
+/* Hero aurora — soft drifting accent light behind the hero */
+.hero { position: relative; isolation: isolate; }
+.hero::before {
+    content: '';
+    position: absolute; z-index: -1;
+    top: -200px; left: 50%;
+    width: min(1100px, 130%); height: 760px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    background:
+        radial-gradient(42% 55% at 28% 32%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%),
+        radial-gradient(40% 50% at 76% 40%, color-mix(in srgb, var(--accent-3) 32%, transparent), transparent 72%);
+    filter: blur(38px);
+    opacity: 0.6;
+    animation: hero-aurora 16s ease-in-out infinite alternate;
+}
+@keyframes hero-aurora {
+    0%   { transform: translateX(-53%) translateY(-8px) scale(1); }
+    100% { transform: translateX(-47%) translateY(10px) scale(1.08); }
+}
+
+/* Headline — confident glow */
+.hero h1 { text-shadow: 0 0 44px color-mix(in srgb, var(--accent) 16%, transparent); }
+.grad { filter: drop-shadow(0 0 16px color-mix(in srgb, var(--accent) 20%, transparent)); }
+
+/* Mock card — slow rotating accent halo */
+.mock::after {
+    content: ''; position: absolute; inset: -3px; border-radius: 24px; z-index: -1;
+    background: conic-gradient(from 0deg,
+        color-mix(in srgb, var(--accent) 60%, transparent),
+        transparent 30%,
+        color-mix(in srgb, var(--accent-3) 60%, transparent) 65%,
+        transparent 95%);
+    filter: blur(12px); opacity: 0.45;
+    animation: spin-slow 14s linear infinite;
+}
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+
+/* Feature grid — activate the per-card accent hues (the inline --c was unused) */
+.feature-icon {
+    color: var(--c, var(--accent));
+    background: color-mix(in srgb, var(--c, var(--accent)) 14%, transparent);
+    border-color: color-mix(in srgb, var(--c, var(--accent)) 28%, transparent);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--c, var(--accent)) 20%, transparent);
+}
+.feature { position: relative; overflow: hidden; }
+.feature::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c, var(--accent)) 75%, transparent), transparent);
+    opacity: 0.45; transition: opacity 0.3s ease;
+}
+.feature:hover::before { opacity: 1; }
+.feature:hover {
+    border-color: color-mix(in srgb, var(--c, var(--accent)) 55%, transparent);
+    box-shadow: 0 22px 54px rgba(0,0,0,0.5), 0 0 38px color-mix(in srgb, var(--c, var(--accent)) 20%, transparent);
+}
+.feature:hover .feature-icon { box-shadow: 0 0 34px color-mix(in srgb, var(--c, var(--accent)) 42%, transparent); }
+.feature:hover h3 { color: var(--c, var(--accent)); }
+
+/* Featured pricing — standout glow + gentle pulse so it's clearly the pick */
+.price-card.featured {
+    transform: translateY(-8px);
+    box-shadow: 0 24px 64px rgba(0,0,0,.55),
+                0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent),
+                0 0 48px color-mix(in srgb, var(--accent) 16%, transparent);
+    animation: price-glow 4.5s ease-in-out infinite;
+}
+@keyframes price-glow {
+    0%,100% { box-shadow: 0 24px 64px rgba(0,0,0,.55), 0 0 0 1px color-mix(in srgb, var(--accent) 42%, transparent), 0 0 40px color-mix(in srgb, var(--accent) 12%, transparent); }
+    50%     { box-shadow: 0 24px 64px rgba(0,0,0,.55), 0 0 0 1px color-mix(in srgb, var(--accent) 60%, transparent), 0 0 72px color-mix(in srgb, var(--accent) 26%, transparent); }
+}
+.price-card.featured:hover { transform: translateY(-12px); }
